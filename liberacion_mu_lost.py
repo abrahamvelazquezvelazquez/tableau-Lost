@@ -10,13 +10,13 @@ client = gspread.authorize(creds)
 ID_HOJA_PRINCIPAL = "1tLAyayZkAWJ0XtyQWWILutdQ_8sr7rjf1VsXxcAuL4M"
 NOMBRE_PESTAÑA_PRINCIPAL = "Seguimiento"
 
-# Tu hoja propia con el IMPORTRANGE
+# ID exacto de la hoja propia con el IMPORTRANGE
 EXTERNAL_ID = "1acrZZyBuvEjCQoMqlklzsvlZBFKHSfCo5zMPiNR-h0w"
 EXTERNAL_SHEET_NAME = "TC"
 
 
 def liberacion_mu_lost():
-    ss_principal = client.open_by_key(ID_HOJA_PRINCIPAL)
+    ss_principal = client.open_by_key(ID_HOJA_PRINCIPAL.strip())
     sheet = ss_principal.worksheet(NOMBRE_PESTAÑA_PRINCIPAL)
 
     # 1. Obtener datos locales (Columnas I y K -> Columnas 9 y 11)
@@ -34,7 +34,7 @@ def liberacion_mu_lost():
         col_k.append("")
 
     # 2. Obtener datos de la pestaña TC
-    ext_ss = client.open_by_key(EXTERNAL_ID)
+    ext_ss = client.open_by_key(EXTERNAL_ID.strip())
     ext_sheet = ext_ss.worksheet(EXTERNAL_SHEET_NAME)
     data_ext = ext_sheet.get_all_values()
 
