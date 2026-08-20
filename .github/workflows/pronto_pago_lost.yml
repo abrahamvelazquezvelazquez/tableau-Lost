@@ -1,0 +1,22 @@
+name: Actualizador Pronto Pago y Refunded Lost
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'  # Se ejecuta cada 6 horas
+  workflow_dispatch:
+
+jobs:
+  run-script:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - run: pip install gspread google-auth
+      - name: Crear credenciales
+        env:
+          GCP_CREDS: ${{ secrets.GCP_CREDENTIALS }}
+        run: |
+          echo "$GCP_CREDS" > credentials.json
+      - run: python pronto_pago_lost.py
