@@ -8,7 +8,7 @@ creds = Credentials.from_service_account_file("credentials.json", scopes=SCOPES)
 client = gspread.authorize(creds)
 
 # 1. Configuración de Hojas (Asegúrate de poner aquí el ID de la hoja principal de Lost si es distinto)
-ID_HOJA_PRINCIPAL = "1pNY27z4TuxzqvUHdjxKidO29sbJt5tBZfQDNvBOLh4o"
+ID_HOJA_PRINCIPAL = "1tLAyayZkAWJ0XtyQWWILutdQ_8sr7rjf1VsXxcAuL4M"
 NOMBRE_PESTAÑA_PRINCIPAL = "Seguimiento"
 
 ID_HOJA_EXTERNA = "14a5V1g1TiEA3_fuBCUS0nLZ_QTSHQeGTfbw0anKvgMc"
