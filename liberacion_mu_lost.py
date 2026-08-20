@@ -6,10 +6,12 @@ SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
 creds = Credentials.from_service_account_file("credentials.json", scopes=SCOPES)
 client = gspread.authorize(creds)
 
-# Configuración de Hoja Principal (Lost)
+# Libro Principal (Lost)
 ID_HOJA_PRINCIPAL = "1tLAyayZkAWJ0XtyQWWILutdQ_8sr7rjf1VsXxcAuL4M"
 NOMBRE_PESTAÑA_PRINCIPAL = "Seguimiento"
-NOMBRE_PESTAÑA_TC = "TC"
+
+# Libro propio con IMPORTRANGE (Tickets ICQA)
+ID_HOJA_TC = "1acrZZyBuvEjCQoMqlklzsvlZBFKHSfCo5zMPiNR-h0w"
 
 
 def liberacion_mu_lost():
@@ -30,10 +32,21 @@ def liberacion_mu_lost():
     while len(col_k) < num_rows:
         col_k.append("")
 
-    # 2. Obtener datos de la pestaña TC (dentro del mismo libro principal)
-    sheet_tc = ss_principal.worksheet(NOMBRE_PESTAÑA_TC)
-    data_ext = sheet_tc.get_all_values()
+    # 2. Abrir libro externo propio (Tickets ICQA) y buscar la pestaña TC
+    ss_tc = client.open_by_key(ID_HOJA_TC.strip())
+    
+    # Búsqueda flexible de pestaña
+    sheet_tc = None
+    for ws in ss_tc.worksheets():
+        if ws.title.strip().lower() == "tc":
+            sheet_tc = ws
+            break
 
+    if not sheet_tc:
+        print("Error: No se encontró la pestaña 'TC' en el libro Tickets ICQA.")
+        return
+
+    data_ext = sheet_tc.get_all_values()
     if not data_ext:
         print("La pestaña TC no contiene datos.")
         return
