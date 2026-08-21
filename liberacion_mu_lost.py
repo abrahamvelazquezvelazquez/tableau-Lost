@@ -2,23 +2,28 @@ import gspread
 from google.oauth2.service_account import Credentials
 
 # Autenticación
-SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
+SCOPES = [
+    "https://www.googleapis.com/auth/spreadsheets",
+    "https://www.googleapis.com/auth/drive"
+]
 creds = Credentials.from_service_account_file("credentials.json", scopes=SCOPES)
 client = gspread.authorize(creds)
 
-# Libro Principal (Lost)
-ID_HOJA_PRINCIPAL = "1tLAyayZkAWJ0XtyQWWILutdQ_8sr7rjf1VsXxcAuL4M"
+# URL de la hoja principal (Lost)
+URL_HOJA_PRINCIPAL = "https://docs.google.com/spreadsheets/d/1tLAyayZkAWJ0XtyQWWILutdQ_8sr7rjf1VsXxcAuL4M/edit"
 NOMBRE_PESTAÑA_PRINCIPAL = "Seguimiento"
 
-# Libro propio con IMPORTRANGE (Tickets ICQA)
-ID_HOJA_TC = "1acrZZyBuvEjCQoMqlklzsvlZBFKHSfCo5zMPiNR-h0w"
+# URL de tu hoja propia con el IMPORTRANGE (Tickets ICQA)
+URL_HOJA_TC = "https://docs.google.com/spreadsheets/d/1acrZZyBuvEjCQoMqlklzsvlZBFKHSfCo5zMPiNR-h0w/edit"
+NOMBRE_PESTAÑA_TC = "TC"
 
 
 def liberacion_mu_lost():
-    ss_principal = client.open_by_key(ID_HOJA_PRINCIPAL.strip())
+    # 1. Abrir libro principal por URL
+    ss_principal = client.open_by_url(URL_HOJA_PRINCIPAL)
     sheet = ss_principal.worksheet(NOMBRE_PESTAÑA_PRINCIPAL)
 
-    # 1. Obtener datos locales de Seguimiento (Columnas I y K -> Columnas 9 y 11)
+    # Obtener datos locales de Seguimiento (Columnas I y K -> Columnas 9 y 11)
     col_i = sheet.col_values(9)[1:]
     col_k = sheet.col_values(11)[1:]
 
@@ -32,18 +37,17 @@ def liberacion_mu_lost():
     while len(col_k) < num_rows:
         col_k.append("")
 
-    # 2. Abrir libro externo propio (Tickets ICQA) y buscar la pestaña TC
-    ss_tc = client.open_by_key(ID_HOJA_TC.strip())
+    # 2. Abrir hoja de Tickets ICQA por URL
+    ss_tc = client.open_by_url(URL_HOJA_TC)
     
-    # Búsqueda flexible de pestaña
     sheet_tc = None
     for ws in ss_tc.worksheets():
-        if ws.title.strip().lower() == "tc":
+        if ws.title.strip().lower() == NOMBRE_PESTAÑA_TC.lower():
             sheet_tc = ws
             break
 
     if not sheet_tc:
-        print("Error: No se encontró la pestaña 'TC' en el libro Tickets ICQA.")
+        print(f"Error: No se encontró la pestaña '{NOMBRE_PESTAÑA_TC}'.")
         return
 
     data_ext = sheet_tc.get_all_values()
