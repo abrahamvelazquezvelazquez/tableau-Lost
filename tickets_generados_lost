@@ -63,7 +63,7 @@ def obtener_mapa_suma_num(id_sheet, nombre_hoja, col_criterio, col_suma):
     return mapa
 
 
-def tickets_generados_shortage():
+def tickets_generados_lost():
     ss_principal = client.open_by_key(ID_HOJA_PRINCIPAL)
     sheet_destino = ss_principal.worksheet(NOMBRE_PESTAÑA_PRINCIPAL)
 
@@ -131,4 +131,4 @@ def tickets_generados_shortage():
 
 
 if __name__ == "__main__":
-    tickets_generados_shortage()
+    tickets_generados_lost()
