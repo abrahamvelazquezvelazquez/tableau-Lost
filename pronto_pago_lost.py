@@ -1,3 +1,4 @@
+from datetime import datetime
 import gspread
 from google.oauth2.service_account import Credentials
 
@@ -9,7 +10,8 @@ SCOPES = [
 creds = Credentials.from_service_account_file("credentials.json", scopes=SCOPES)
 client = gspread.authorize(creds)
 
-# Configuración de Hoja Principal (Lost)
+# Configuración de Hoja Principal
+# Para Shortage cambia por: "1pNY27z4TuxzqvUHdjxKidO29sbJt5tBZfQDNvBOLh4o"
 ID_HOJA_PRINCIPAL = "1tLAyayZkAWJ0XtyQWWILutdQ_8sr7rjf1VsXxcAuL4M"
 NOMBRE_PESTAÑA_PRINCIPAL = "Seguimiento"
 
@@ -20,6 +22,31 @@ EXT_SHEET_PRONTO_PAGO = "Extracto 1"
 # 2. Hoja Ya Pagadas (Refunded)
 EXT_ID_REFUNDED = "1eTsJEzOKZls1nQJzz_-lHVyFwdsKouHB-Hi4G0UHksE"
 EXT_SHEET_REFUNDED = "pagado"
+
+
+def limpiar_fecha(valor_fecha):
+    """Elimina la hora y deja únicamente la fecha."""
+    if not valor_fecha:
+        return ""
+
+    s_fecha = str(valor_fecha).strip()
+
+    # Si viene con espacio de hora (ej: "6/09/2026 17:17:21") o 'T' (ISO)
+    if " " in s_fecha:
+        s_fecha = s_fecha.split(" ")[0]
+    elif "T" in s_fecha:
+        s_fecha = s_fecha.split("T")[0]
+
+    # Intentar parsear formatos comunes para estandarizar
+    formatos = ["%d/%m/%Y", "%m/%d/%Y", "%Y-%m-%d", "%d-%m-%Y", "%Y/%m/%d"]
+    for fmt in formatos:
+        try:
+            dt = datetime.strptime(s_fecha, fmt)
+            return dt.strftime("%d/%m/%Y")
+        except ValueError:
+            continue
+
+    return s_fecha
 
 
 def procesar_pagos_lost():
@@ -58,7 +85,7 @@ def procesar_pagos_lost():
         print("No hay filas para procesar en la Columna E.")
         return
 
-    # Leer valores existentes en la hoja destino para no perder datos previo si no hay coincidencia
+    # Leer valores existentes en la hoja destino para no perder datos previo
     c_piezas = sheet.col_values(col_piezas_pagadas)[1:]
     c_usd = sheet.col_values(col_usd_pagado)[1:]
     c_fecha = sheet.col_values(col_fecha_pago)[1:]
@@ -83,7 +110,7 @@ def procesar_pagos_lost():
             for row in data_pronto[1:]:
                 if len(row) >= 2:
                     key = str(row[0]).strip()
-                    val_fecha = str(row[1]).strip()
+                    val_fecha = limpiar_fecha(row[1])
                     if key and val_fecha and key not in mapa_pronto_pago:
                         mapa_pronto_pago[key] = val_fecha
     except Exception as e:
@@ -104,7 +131,7 @@ def procesar_pagos_lost():
                     key = str(row[0]).strip()
                     if key and key not in mapa_refunded:
                         mapa_refunded[key] = {
-                            "fechaPago": str(row[2]).strip() if len(row) > 2 else "",
+                            "fechaPago": limpiar_fecha(row[2]) if len(row) > 2 else "",
                             "usdPagado": str(row[3]).strip() if len(row) > 3 else "",
                             "piezasPagadas": str(row[4]).strip() if len(row) > 4 else "",
                         }
@@ -123,13 +150,13 @@ def procesar_pagos_lost():
 
         val_piezas = c_piezas[i]
         val_usd = c_usd[i]
-        val_fecha = c_fecha[i]
+        val_fecha = limpiar_fecha(c_fecha[i])
 
-        # 1. Aplicar primero Pronto Pago (si existe fecha asignada próxima a pago)
+        # 1. Aplicar primero Pronto Pago
         if key in mapa_pronto_pago:
             val_fecha = mapa_pronto_pago[key]
 
-        # 2. Aplicar sobreescritura de Ya Pagados (si la coincidencia trae datos reales de pago)
+        # 2. Aplicar sobreescritura de Ya Pagados
         if key in mapa_refunded:
             ref = mapa_refunded[key]
 
@@ -137,7 +164,6 @@ def procesar_pagos_lost():
                 val_piezas = ref["piezasPagadas"]
             if ref["usdPagado"] != "":
                 val_usd = ref["usdPagado"]
-            # Sobreescribir la fecha únicamente si trae un dato válido de pago confirmado
             if ref["fechaPago"] != "":
                 val_fecha = ref["fechaPago"]
 
@@ -172,7 +198,7 @@ def procesar_pagos_lost():
         range_name=f"{col_letter_f}{fila_inicio}:{col_letter_f}{fila_fin}",
     )
 
-    print(f"Se actualizaron {num_rows} filas de pagos en Lost exitosamente.")
+    print(f"Se actualizaron {num_rows} filas de pagos exitosamente sin formato de hora.")
 
 
 if __name__ == "__main__":
