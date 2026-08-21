@@ -1,19 +1,42 @@
 from collections import defaultdict
+from datetime import datetime
 import gspread
 from google.oauth2.service_account import Credentials
 
 # Autenticación
-SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
+SCOPES = [
+    "https://www.googleapis.com/auth/spreadsheets",
+    "https://www.googleapis.com/auth/drive",
+]
 creds = Credentials.from_service_account_file("credentials.json", scopes=SCOPES)
 client = gspread.authorize(creds)
 
-# Configuración de Hojas
+# Configuración de Hojas (Lost)
 ID_HOJA_PRINCIPAL = "1tLAyayZkAWJ0XtyQWWILutdQ_8sr7rjf1VsXxcAuL4M"
 NOMBRE_PESTAÑA_PRINCIPAL = "Seguimiento"
 
-# Tu hoja propia con el IMPORTRANGE
-ID_HOJA_EXTERNA = "1acrZzYBuvEjCQoMqIklzsvIZBfKHSfCo5zMPiNR-h0w"
+# ID de Hoja Externa corregido con 'l' minúsculas
+ID_HOJA_EXTERNA = "1acrZZyBuvEjCQoMqlklzsvlZBFKHSfCo5zMPiNR-h0w"
 NOMBRE_HOJA_EXTERNA = "PE"
+
+
+def formatear_fecha(valor_fecha):
+    """Limpia y formatea las fechas a formato dd/mm/yy."""
+    if not valor_fecha:
+        return ""
+
+    s_fecha = str(valor_fecha).strip()
+    
+    # Intenta parsear formatos comunes de fechas si vienen como texto/ISO
+    Formatos = ["%Y-%m-%d", "%d/%m/%Y", "%Y/%m/%d", "%d-%m-%Y"]
+    for fmt in Formatos:
+        try:
+            dt = datetime.strptime(s_fecha.split("T")[0], fmt)
+            return dt.strftime("%d/%m/%y")
+        except ValueError:
+            continue
+
+    return s_fecha
 
 
 def buscar_pe_lost():
@@ -32,12 +55,12 @@ def buscar_pe_lost():
     mapa_externo = defaultdict(dict)
 
     for fila in datos_ext[1:]:
-        if len(fila) < 6:
+        if len(fila) <= 1:
             continue
 
-        llave_busqueda = str(fila[1]).strip()  # Columna A: ISSUE ID (Índice 0)
+        llave_busqueda = str(fila[1]).strip()  # Columna B: ISSUE ID (Índice 1)
         if llave_busqueda:
-            reg_date = fila[13] if len(fila) > 2 else ""      # Columna N: FECHA (Índice 13)
+            reg_date = formatear_fecha(fila[13]) if len(fila) > 13 else "" # Columna N: FECHA (Índice 13)
             status = fila[2] if len(fila) > 2 else ""      # Columna C: INCONSISTENCIA (Índice 2)
             type_inc = fila[3] if len(fila) > 3 else ""    # Columna D: TIPO_DE_INCONSISTENCIA (Índice 3)
             site = fila[4] if len(fila) > 4 else ""        # Columna E: DESTINO (Índice 4)
@@ -115,14 +138,15 @@ def buscar_pe_lost():
         return
 
     # 5. Escritura de resultados
+    num_rows = len(issue_keys)
     fila_inicio = 2
-    fila_fin = fila_inicio + len(paste_r) - 1
+    fila_fin = fila_inicio + num_rows - 1
 
     col_letter = gspread.utils.rowcol_to_a1(1, columna_destino)[:-1]
     range_a1 = f"{col_letter}{fila_inicio}:{col_letter}{fila_fin}"
 
     hoja_origen.update(values=paste_r, range_name=range_a1)
-    print(f"Se actualizaron {len(paste_r)} filas en Buscar PE Shortage exitosamente.")
+    print(f"Se actualizaron {num_rows} filas en Buscar PE Lost exitosamente.")
 
 
 if __name__ == "__main__":
