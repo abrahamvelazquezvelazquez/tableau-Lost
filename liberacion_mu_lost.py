@@ -9,18 +9,18 @@ SCOPES = [
 creds = Credentials.from_service_account_file("credentials.json", scopes=SCOPES)
 client = gspread.authorize(creds)
 
-# 1. Hoja Principal (Lost)
-ID_HOJA_PRINCIPAL = "1tLAyayZkAWJ0XtyQWWILutdQ_8sr7rjf1VsXxcAuL4M"
+# 1. URL de la Hoja Principal (Lost)
+URL_HOJA_PRINCIPAL = "https://docs.google.com/spreadsheets/d/1tLAyayZkAWJ0XtyQWWILutdQ_8sr7rjf1VsXxcAuL4M/edit?gid=0#gid=0"
 NOMBRE_PESTAÑA_PRINCIPAL = "Seguimiento"
 
-# 2. Hoja Externa (Tickets ICQA con la pestaña TC)
-ID_HOJA_TC = "1acrZZyBuvEjCQoMqlklzsvlZBFKHSfCo5zMPiNR-h0w"
+# 2. URL de la Hoja Externa (Tickets ICQA con la pestaña TC)
+URL_HOJA_TC = "https://docs.google.com/spreadsheets/d/1acrZzYBuvEjCQoMqIklzsvIZBfKHSfCo5zMPiNR-h0w/edit?gid=224588725#gid=224588725"
 NOMBRE_PESTAÑA_TC = "TC"
 
 
 def liberacion_mu_lost():
-    # Abrir Hoja Principal
-    ss_principal = client.open_by_key(ID_HOJA_PRINCIPAL)
+    # Abrir Hoja Principal por URL
+    ss_principal = client.open_by_url(URL_HOJA_PRINCIPAL)
     sheet = ss_principal.worksheet(NOMBRE_PESTAÑA_PRINCIPAL)
 
     # Buscar índices de columnas en Fila 1 de Seguimiento
@@ -45,8 +45,8 @@ def liberacion_mu_lost():
         print("No hay datos en la columna Key para procesar.")
         return
 
-    # Abrir Hoja Externa y Pestaña TC
-    ss_tc = client.open_by_key(ID_HOJA_TC)
+    # Abrir Hoja Externa por URL y seleccionar la pestaña TC
+    ss_tc = client.open_by_url(URL_HOJA_TC)
     sheet_tc = ss_tc.worksheet(NOMBRE_PESTAÑA_TC)
     data_ext = sheet_tc.get_all_values()
 
