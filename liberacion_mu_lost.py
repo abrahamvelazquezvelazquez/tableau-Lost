@@ -57,8 +57,8 @@ def liberacion_mu_lost():
     # Mapeo: Columna A (Índice 0) -> Columna C (Índice 2)
     lookup = {}
     for row in data_ext:
-        if len(row) > 0:
-            llave_ext = str(row[0]).strip()
+        if len(row) > 10:
+            llave_ext = str(row[10]).strip()
             val_c = str(row[2]).strip() if len(row) > 2 else ""
 
             if llave_ext and llave_ext not in lookup:
