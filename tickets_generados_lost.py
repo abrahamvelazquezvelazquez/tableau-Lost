@@ -18,7 +18,7 @@ ID1 = "10OuyIzexaTIW-QnZ6Bo-Vkgh6qexjiTySmHDdijA_m8"
 HOJA1_NOMBRE = "CG.2"
 
 # Hoja 2: Tickets ICQA (ID corregido con 'l' minúsculas)
-ID2 = "1acrZZyBuvEjCQoMqlklzsvlZBFKHSfCo5zMPiNR-h0w"
+ID2 = "1acrZzYBuvEjCQoMqIklzsvIZBfKHSfCo5zMPiNR-h0w"
 HOJA2_NOMBRE = "indebidas"
 
 
