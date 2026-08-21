@@ -37,7 +37,7 @@ def buscar_pe_lost():
 
         llave_busqueda = str(fila[1]).strip()  # Columna A: ISSUE ID (Índice 0)
         if llave_busqueda:
-            reg_date = ""  # En la pestaña PE no hay columna de fecha de registro
+            reg_date = fila[13] if len(fila) > 2 else ""      # Columna N: FECHA (Índice 13)
             status = fila[2] if len(fila) > 2 else ""      # Columna C: INCONSISTENCIA (Índice 2)
             type_inc = fila[3] if len(fila) > 3 else ""    # Columna D: TIPO_DE_INCONSISTENCIA (Índice 3)
             site = fila[4] if len(fila) > 4 else ""        # Columna E: DESTINO (Índice 4)
@@ -84,7 +84,7 @@ def buscar_pe_lost():
                 )
 
                 col_date = str(d["regDate"]).ljust(9)
-                col_site = str(d["site"]).ljust(7)
+                col_site = str(d["site"]).ljust(9)
                 col_handed = str(d["handed"]).ljust(10)
                 col_qty = qty_str.ljust(4)
                 col_status = str(d["status"]).ljust(10)
