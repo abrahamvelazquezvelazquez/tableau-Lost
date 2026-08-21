@@ -1,4 +1,4 @@
-name: Actualizador Tickets Generados Shortage
+name: Actualizador Tickets Generados Lost
 
 on:
   schedule:
@@ -17,5 +17,6 @@ jobs:
       - name: Crear credenciales
         env:
           GCP_CREDS: ${{ secrets.GCP_CREDENTIALS }}
-        run: printf '%s' "$GCP_CREDS" > credentials.json
+        run: |
+          echo "$GCP_CREDS" > credentials.json
       - run: python tickets_generados_lost.py
