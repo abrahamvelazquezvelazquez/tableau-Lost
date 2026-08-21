@@ -7,7 +7,7 @@ creds = Credentials.from_service_account_file("credentials.json", scopes=SCOPES)
 client = gspread.authorize(creds)
 
 # Configuración de Hojas
-ID_LOCAL = "1pNY27z4TuxzqvUHdjxKidO29sbJt5tBZfQDNvBOLh4o"
+ID_LOCAL = "1tLAyayZkAWJ0XtyQWWILutdQ_8sr7rjf1VsXxcAuL4M"
 NOMBRE_PESTAÑA_LOCAL = "Seguimiento"
 
 ID_EXTERNA = "10OuyIzexaTIW-QnZ6Bo-Vkgh6qexjiTySmHDdijA_m8"
@@ -131,4 +131,4 @@ def seguimiento_ccm_lost():
 
 
 if __name__ == "__main__":
-    seguimiento_ccm_shortage()
+    seguimiento_ccm_lost()
