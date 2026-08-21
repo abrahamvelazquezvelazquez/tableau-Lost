@@ -10,11 +10,11 @@ creds = Credentials.from_service_account_file("credentials.json", scopes=SCOPES)
 client = gspread.authorize(creds)
 
 # URL de la hoja principal (Lost)
-URL_HOJA_PRINCIPAL = "https://docs.google.com/spreadsheets/d/1tLAyayZkAWJ0XtyQWWILutdQ_8sr7rjf1VsXxcAuL4M/edit"
+URL_HOJA_PRINCIPAL = "https://docs.google.com/spreadsheets/d/1pNY27z4TuxzqvUHdjxKidO29sbJt5tBZfQDNvBOLh4o/edit?gid=0#gid=0"
 NOMBRE_PESTAÑA_PRINCIPAL = "Seguimiento"
 
 # URL de tu hoja propia con el IMPORTRANGE (Tickets ICQA)
-URL_HOJA_TC = "https://docs.google.com/spreadsheets/d/1acrZZyBuvEjCQoMqlklzsvlZBFKHSfCo5zMPiNR-h0w/edit"
+URL_HOJA_TC = "https://docs.google.com/spreadsheets/d/1acrZzYBuvEjCQoMqIklzsvIZBfKHSfCo5zMPiNR-h0w/edit?gid=224588725#gid=224588725"
 NOMBRE_PESTAÑA_TC = "TC"
 
 
