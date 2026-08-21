@@ -2,11 +2,14 @@ import gspread
 from google.oauth2.service_account import Credentials
 
 # Autenticación
-SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
+SCOPES = [
+    "https://www.googleapis.com/auth/spreadsheets",
+    "https://www.googleapis.com/auth/drive",
+]
 creds = Credentials.from_service_account_file("credentials.json", scopes=SCOPES)
 client = gspread.authorize(creds)
 
-# Configuración de Hoja Principal
+# Configuración de Hoja Principal (Lost)
 ID_HOJA_PRINCIPAL = "1tLAyayZkAWJ0XtyQWWILutdQ_8sr7rjf1VsXxcAuL4M"
 NOMBRE_PESTAÑA_PRINCIPAL = "Seguimiento"
 
@@ -14,14 +17,25 @@ NOMBRE_PESTAÑA_PRINCIPAL = "Seguimiento"
 ID1 = "10OuyIzexaTIW-QnZ6Bo-Vkgh6qexjiTySmHDdijA_m8"
 HOJA1_NOMBRE = "CG.2"
 
-# Hoja 2: Tickets ICQA
-ID2 = "1acrZzYBuvEjCQoMqIklzsvIZBfKHSfCo5zMPiNR-h0w"
+# Hoja 2: Tickets ICQA (ID corregido con 'l' minúsculas)
+ID2 = "1acrZZyBuvEjCQoMqlklzsvlZBFKHSfCo5zMPiNR-h0w"
 HOJA2_NOMBRE = "indebidas"
+
+
+def abrir_hoja_segura(id_or_url):
+    """Abre un libro intentando por URL o por ID para evitar errores 404."""
+    try:
+        if "docs.google.com" in id_or_url:
+            return client.open_by_url(id_or_url)
+        return client.open_by_key(id_or_url)
+    except Exception:
+        url_fallback = f"https://docs.google.com/spreadsheets/d/{id_or_url}/edit"
+        return client.open_by_url(url_fallback)
 
 
 def obtener_mapa_valor_directo(id_sheet, nombre_hoja, col_criterio, col_valor):
     """Abre la hoja especificada y mapea la clave con el valor directo (sin sumar)."""
-    ext_ss = client.open_by_key(id_sheet)
+    ext_ss = abrir_hoja_segura(id_sheet)
     ext_sheet = ext_ss.worksheet(nombre_hoja)
     datos = ext_sheet.get_all_values()
 
@@ -33,7 +47,6 @@ def obtener_mapa_valor_directo(id_sheet, nombre_hoja, col_criterio, col_valor):
         if len(fila) > max(col_criterio, col_valor):
             llave = str(fila[col_criterio]).strip()
             if llave and llave not in mapa:
-                # Guardamos el texto o contenido directo de la columna
                 mapa[llave] = str(fila[col_valor]).strip()
 
     return mapa
@@ -41,7 +54,7 @@ def obtener_mapa_valor_directo(id_sheet, nombre_hoja, col_criterio, col_valor):
 
 def obtener_mapa_suma_num(id_sheet, nombre_hoja, col_criterio, col_suma):
     """Mantiene la suma numérica para la hoja 2 (indebidas)."""
-    ext_ss = client.open_by_key(id_sheet)
+    ext_ss = abrir_hoja_segura(id_sheet)
     ext_sheet = ext_ss.worksheet(nombre_hoja)
     datos = ext_sheet.get_all_values()
 
@@ -64,7 +77,7 @@ def obtener_mapa_suma_num(id_sheet, nombre_hoja, col_criterio, col_suma):
 
 
 def tickets_generados_lost():
-    ss_principal = client.open_by_key(ID_HOJA_PRINCIPAL)
+    ss_principal = abrir_hoja_segura(ID_HOJA_PRINCIPAL)
     sheet_destino = ss_principal.worksheet(NOMBRE_PESTAÑA_PRINCIPAL)
 
     # 1. Obtener criterios de Columna E (Columna 5, Fila 2 en adelante)
@@ -86,7 +99,9 @@ def tickets_generados_lost():
             col_indebidas = idx + 1
 
     if col_cg == 0 or col_indebidas == 0:
-        print("Error: No se encontró la columna 'Piezas con ticket CG' o 'Piezas con ticket indebidas'.")
+        print(
+            "Error: No se encontró la columna 'Piezas con ticket CG' o 'Piezas con ticket indebidas'."
+        )
         return
 
     # 3. Construir mapas
@@ -109,7 +124,9 @@ def tickets_generados_lost():
             val1 = mapa1.get(criterio, "")
             val2 = mapa2.get(criterio, 0.0)
 
-            val2_formatted = int(val2) if isinstance(val2, float) and val2.is_integer() else val2
+            val2_formatted = (
+                int(val2) if isinstance(val2, float) and val2.is_integer() else val2
+            )
 
             resultados_cg.append([val1])
             resultados_indebidas.append([val2_formatted])
@@ -122,12 +139,16 @@ def tickets_generados_lost():
     range_cg = f"{col_cg_letter}{fila_inicio}:{col_cg_letter}{fila_fin}"
 
     col_indebidas_letter = gspread.utils.rowcol_to_a1(1, col_indebidas)[:-1]
-    range_indebidas = f"{col_indebidas_letter}{fila_inicio}:{col_indebidas_letter}{fila_fin}"
+    range_indebidas = (
+        f"{col_indebidas_letter}{fila_inicio}:{col_indebidas_letter}{fila_fin}"
+    )
 
     sheet_destino.update(values=resultados_cg, range_name=range_cg)
     sheet_destino.update(values=resultados_indebidas, range_name=range_indebidas)
 
-    print(f"Se actualizaron {len(valores_e)} filas en ambas columnas de tickets exitosamente.")
+    print(
+        f"Se actualizaron {len(valores_e)} filas en ambas columnas de tickets exitosamente."
+    )
 
 
 if __name__ == "__main__":
