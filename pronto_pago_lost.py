@@ -131,9 +131,9 @@ def procesar_pagos_lost():
                     key = str(row[0]).strip()
                     if key and key not in mapa_refunded:
                         mapa_refunded[key] = {
-                            "fechaPago": limpiar_fecha(row[2]) if len(row) > 2 else "",
-                            "usdPagado": str(row[3]).strip() if len(row) > 3 else "",
-                            "piezasPagadas": str(row[4]).strip() if len(row) > 4 else "",
+                            "fechaPago": limpiar_fecha(row[1]) if len(row) > 1 else "",
+                            "usdPagado": str(row[2]).strip() if len(row) > 2 else "",
+                            "piezasPagadas": str(row[3]).strip() if len(row) > 3 else "",
                         }
     except Exception as e:
         print(f"Aviso al cargar Refunded: {e}")
