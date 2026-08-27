@@ -17,6 +17,23 @@ EXTERNAL_ID = "1eTsJEzOKZls1nQJzz_-lHVyFwdsKouHB-Hi4G0UHksE"
 EXTERNAL_SHEET_NAME = "Extracto 1"
 
 
+def parse_number(val):
+    """Convierte un valor de texto a float o int si es numérico
+
+    para evitar el apóstrofe (') al escribir en Google Sheets.
+    """
+    if val is None or str(val).strip() == "":
+        return ""
+    try:
+        # Elimina comas de separadores de miles o espacios si existieran
+        clean_val = str(val).replace(",", "").strip()
+        num = float(clean_val)
+        return int(num) if num.is_integer() else num
+    except ValueError:
+        # Si no se puede convertir a número (ej. texto), devuelve el valor original
+        return val
+
+
 def issues_pendientes_lost():
     # 1. Abrir hoja principal y seleccionar pestaña
     ss_principal = client.open_by_key(ID_HOJA_PRINCIPAL)
@@ -58,8 +75,6 @@ def issues_pendientes_lost():
         return
 
     # Crear mapa de búsqueda
-    # getRange(2, 4, lastRowExt - 1, 7) en Apps Script equivale a empezar en la Columna D (Índice 3)
-    # row[0] es Col D, row[2] es Col F, row[3] es Col G
     lookup = {}
     for row in data_ext[1:]:
         if len(row) > 3:
@@ -69,7 +84,7 @@ def issues_pendientes_lost():
                 col_f_ext = row[6] if len(row) > 6 else ""  # Columna G externa
                 lookup[key] = {"colE": col_e_ext, "colF": col_f_ext}
 
-    # 3. Preparar arreglos de resultados
+    # 3. Preparar arreglos de resultados parseando números
     output_mxn = []
     output_qty = []
 
@@ -78,8 +93,8 @@ def issues_pendientes_lost():
 
         if key in lookup:
             match = lookup[key]
-            output_mxn.append([match["colF"]])
-            output_qty.append([match["colE"]])
+            output_mxn.append([parse_number(match["colF"])])
+            output_qty.append([parse_number(match["colE"])])
         else:
             output_mxn.append([""])
             output_qty.append([""])
@@ -92,12 +107,20 @@ def issues_pendientes_lost():
     # MXN Pending
     col_letter_mxn = gspread.utils.rowcol_to_a1(1, col_mxn_index)[:-1]
     range_mxn = f"{col_letter_mxn}{fila_inicio}:{col_letter_mxn}{fila_fin}"
-    sheet.update(values=output_mxn, range_name=range_mxn)
+    sheet.update(
+        range_name=range_mxn,
+        values=output_mxn,
+        value_input_option="USER_ENTERED",
+    )
 
     # Qty pending
     col_letter_qty = gspread.utils.rowcol_to_a1(1, col_qty_index)[:-1]
     range_qty = f"{col_letter_qty}{fila_inicio}:{col_letter_qty}{fila_fin}"
-    sheet.update(values=output_qty, range_name=range_qty)
+    sheet.update(
+        range_name=range_qty,
+        values=output_qty,
+        value_input_option="USER_ENTERED",
+    )
 
     print(
         f"Se actualizaron {num_rows} filas en 'MXN Pending' y 'Qty pending' de Issues Pendientes Lost exitosamente."
