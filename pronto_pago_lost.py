@@ -24,6 +24,21 @@ EXT_ID_REFUNDED = "1eTsJEzOKZls1nQJzz_-lHVyFwdsKouHB-Hi4G0UHksE"
 EXT_SHEET_REFUNDED = "pagado"
 
 
+def parse_number(val):
+    """Convierte un valor de texto a float o int si es numérico
+
+    para evitar el apóstrofe (') al escribir en Google Sheets.
+    """
+    if val is None or str(val).strip() == "":
+        return ""
+    try:
+        clean_val = str(val).replace(",", "").strip()
+        num = float(clean_val)
+        return int(num) if num.is_integer() else num
+    except ValueError:
+        return val
+
+
 def limpiar_fecha(valor_fecha):
     """Elimina la hora y deja únicamente la fecha."""
     if not valor_fecha:
@@ -73,7 +88,9 @@ def procesar_pagos_lost():
             col_fecha_pago = idx + 1
 
     if not (col_piezas_pagadas and col_usd_pagado and col_fecha_pago):
-        print("Error: No se encontraron las columnas 'Piezas pagadas', 'USD Pagado' y/o 'Fecha de pago'.")
+        print(
+            "Error: No se encontraron las columnas 'Piezas pagadas', 'USD Pagado' y/o 'Fecha de pago'."
+        )
         return
 
     # Leer Claves (Columna E - Índice 5)
@@ -85,7 +102,7 @@ def procesar_pagos_lost():
         print("No hay filas para procesar en la Columna E.")
         return
 
-    # Leer valores existentes en la hoja destino para no perder datos previo
+    # Leer valores existentes en la hoja destino para no perder datos previos
     c_piezas = sheet.col_values(col_piezas_pagadas)[1:]
     c_usd = sheet.col_values(col_usd_pagado)[1:]
     c_fecha = sheet.col_values(col_fecha_pago)[1:]
@@ -131,15 +148,21 @@ def procesar_pagos_lost():
                     key = str(row[0]).strip()
                     if key and key not in mapa_refunded:
                         mapa_refunded[key] = {
-                            "fechaPago": limpiar_fecha(row[1]) if len(row) > 1 else "",
-                            "usdPagado": str(row[2]).strip() if len(row) > 2 else "",
-                            "piezasPagadas": str(row[3]).strip() if len(row) > 3 else "",
+                            "fechaPago": (
+                                limpiar_fecha(row[1]) if len(row) > 1 else ""
+                            ),
+                            "usdPagado": (
+                                str(row[2]).strip() if len(row) > 2 else ""
+                            ),
+                            "piezasPagadas": (
+                                str(row[3]).strip() if len(row) > 3 else ""
+                            ),
                         }
     except Exception as e:
         print(f"Aviso al cargar Refunded: {e}")
 
     # -------------------------------------------------------------
-    # PASO 3: MEZCLAR DATOS CON LA REGLA DE PRIORIDAD
+    # PASO 3: MEZCLAR DATOS CON LA REGLA DE PRIORIDAD Y CONVERTIR A NÚMERO
     # -------------------------------------------------------------
     output_piezas = []
     output_usd = []
@@ -167,12 +190,13 @@ def procesar_pagos_lost():
             if ref["fechaPago"] != "":
                 val_fecha = ref["fechaPago"]
 
-        output_piezas.append([val_piezas])
-        output_usd.append([val_usd])
+        # Parsear valores numéricos antes de agregarlos al array de salida
+        output_piezas.append([parse_number(val_piezas)])
+        output_usd.append([parse_number(val_usd)])
         output_fecha.append([val_fecha])
 
     # -------------------------------------------------------------
-    # PASO 4: ESCRITURA EN HOJA PRINCIPAL
+    # PASO 4: ESCRITURA EN HOJA PRINCIPAL (Con USER_ENTERED)
     # -------------------------------------------------------------
     fila_inicio = 2
     fila_fin = fila_inicio + num_rows - 1
@@ -180,25 +204,30 @@ def procesar_pagos_lost():
     # Piezas Pagadas
     col_letter_p = gspread.utils.rowcol_to_a1(1, col_piezas_pagadas)[:-1]
     sheet.update(
-        values=output_piezas,
         range_name=f"{col_letter_p}{fila_inicio}:{col_letter_p}{fila_fin}",
+        values=output_piezas,
+        value_input_option="USER_ENTERED",
     )
 
     # USD Pagado
     col_letter_u = gspread.utils.rowcol_to_a1(1, col_usd_pagado)[:-1]
     sheet.update(
-        values=output_usd,
         range_name=f"{col_letter_u}{fila_inicio}:{col_letter_u}{fila_fin}",
+        values=output_usd,
+        value_input_option="USER_ENTERED",
     )
 
     # Fecha de pago
     col_letter_f = gspread.utils.rowcol_to_a1(1, col_fecha_pago)[:-1]
     sheet.update(
-        values=output_fecha,
         range_name=f"{col_letter_f}{fila_inicio}:{col_letter_f}{fila_fin}",
+        values=output_fecha,
+        value_input_option="USER_ENTERED",
     )
 
-    print(f"Se actualizaron {num_rows} filas de pagos exitosamente sin formato de hora.")
+    print(
+        f"Se actualizaron {num_rows} filas de pagos exitosamente sin formato de hora ni apóstrofes."
+    )
 
 
 if __name__ == "__main__":
