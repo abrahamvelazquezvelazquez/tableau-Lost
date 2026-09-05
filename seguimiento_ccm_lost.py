@@ -71,7 +71,7 @@ def seguimiento_ccm_lost():
                 if llave_ext and llave_ext not in mapa_externo:
                     verificacion = fila[17] if len(fila) > 17 else ""  # Columna R (Índice 17)
                     fecha = fila[19] if len(fila) > 19 else ""         # Columna T (Índice 19)
-                    folio = fila[22] if len(fila) > 22 else ""         # Columna W (Índice 22)
+                    folio = fila[22] if len(fila) > 25 else ""         # Columna Z (Índice 22)
                     comentarios = fila[26] if len(fila) > 26 else ""   # Columna AA (Índice 26)
 
                     mapa_externo[llave_ext] = {
