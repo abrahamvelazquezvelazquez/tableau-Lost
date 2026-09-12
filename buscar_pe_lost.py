@@ -145,16 +145,26 @@ def buscar_pe_lost():
                     str(int(p_val)) if p_val.is_integer() else str(round(p_val, 2))
                 )
 
-                col_date = str(d["regDate"]).ljust(11)
-                col_site = str(d["site"]).ljust(7)
-                col_qty = qty_str.ljust(4)
-                col_status = str(d["status"]).ljust(29)
-                col_type = str(d["type"]).ljust(25)
-                col_envio = str(d["envio"]).ljust(11)
-                col_folio = str(d["folio"]).ljust(15)
+                # Asegurar conversión de None o nulos a string vacíos
+                val_date = str(d.get("regDate") or "")
+                val_site = str(d.get("site") or "")
+                val_qty = str(qty_str or "")
+                val_status = str(d.get("status") or "")
+                val_type = str(d.get("type") or "")
+                val_envio = str(d.get("envio") or "")
+                val_folio = str(d.get("folio") or "")
+
+                # Aplicar alineación fija por columna
+                col_date = val_date.ljust(13)
+                col_site = val_site.ljust(9)
+                col_qty = val_qty.ljust(5)
+                col_status = val_status.ljust(28)
+                col_type = val_type.ljust(27)
+                col_envio = val_envio.ljust(13)
+                col_folio = val_folio.ljust(18)
 
                 lineas.append(
-                    f"{col_date} {col_site} {col_qty} {col_status} {col_type} {col_envio} {col_folio}"
+                    f"{col_date}{col_site}{col_qty}{col_status}{col_type}{col_envio}{col_folio}"
                 )
 
             paste_r.append(["\n".join(lineas)])
