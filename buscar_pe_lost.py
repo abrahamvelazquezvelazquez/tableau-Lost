@@ -101,23 +101,25 @@ def buscar_pe_lost():
             status = fila[2] if len(fila) > 2 else ""      # Columna C (Índice 2)
             type_inc = fila[3] if len(fila) > 3 else ""    # Columna D (Índice 3)
             site = fila[4] if len(fila) > 4 else ""        # Columna E (Índice 4)
-            handed = fila[9] if len(fila) > 9 else ""      # Columna J (Índice 9)
+            envio = fila[15] if len(fila) > 15 else ""     # Columna P (Índice 15)
+            folio = fila[14] if len(fila) > 14 else ""     # Columna O (Índice 14)
 
             try:
                 fdqty = float(fila[5]) if len(fila) > 5 else 0.0  # Columna F (Índice 5)
             except ValueError:
                 fdqty = 0.0
 
-            sub_llave = f"{site}|{handed}|{type_inc}"
+            sub_llave = f"{site}|{envio}|{type_inc}"
 
             if sub_llave not in mapa_externo[llave_busqueda]:
                 mapa_externo[llave_busqueda][sub_llave] = {
                     "regDate": reg_date,
                     "site": site,
-                    "handed": handed,
+                    "envio": envio,
                     "status": status,
                     "type": type_inc,
                     "totalQTY": fdqty,
+                    "folio": folio,
                 }
             else:
                 mapa_externo[llave_busqueda][sub_llave]["totalQTY"] += fdqty
@@ -145,13 +147,14 @@ def buscar_pe_lost():
 
                 col_date = str(d["regDate"]).ljust(9)
                 col_site = str(d["site"]).ljust(9)
-                col_handed = str(d["handed"]).ljust(10)
                 col_qty = qty_str.ljust(4)
                 col_status = str(d["status"]).ljust(10)
                 col_type = str(d["type"])
+                col_envio = str(d["envio"]).ljust(10)
+                col_folio = str(d["folio"]).ljust(15)
 
                 lineas.append(
-                    f"{col_date} {col_site} {col_handed} {col_qty} {col_status} {col_type}"
+                    f"{col_date} {col_site} {col_qty} {col_status} {col_type} {col_envio} {col_folio}"
                 )
 
             paste_r.append(["\n".join(lineas)])
@@ -160,7 +163,7 @@ def buscar_pe_lost():
 
     # 4. Buscar columna de destino por su encabezado en Fila 1
     encabezado_buscado = (
-        "Fecha entrega / Site / Entregó / Piezas / Estado / Tipo inconsistencia"
+        "Fecha entrega / Site / Piezas / Estado / Tipo inconsistencia / Fecha envio / Folio"
     )
     encabezados = hoja_origen.row_values(1)
 
