@@ -145,12 +145,12 @@ def buscar_pe_lost():
                     str(int(p_val)) if p_val.is_integer() else str(round(p_val, 2))
                 )
 
-                col_date = str(d["regDate"]).ljust(9)
-                col_site = str(d["site"]).ljust(9)
+                col_date = str(d["regDate"]).ljust(11)
+                col_site = str(d["site"]).ljust(7)
                 col_qty = qty_str.ljust(4)
-                col_status = str(d["status"]).ljust(10)
-                col_type = str(d["type"])
-                col_envio = str(d["envio"]).ljust(10)
+                col_status = str(d["status"]).ljust(29)
+                col_type = str(d["type"]).ljust(25)
+                col_envio = str(d["envio"]).ljust(11)
                 col_folio = str(d["folio"]).ljust(15)
 
                 lineas.append(
