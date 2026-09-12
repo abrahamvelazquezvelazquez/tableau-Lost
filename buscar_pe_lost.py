@@ -99,7 +99,7 @@ def buscar_pe_lost():
         if llave_busqueda:
             reg_date = formatear_fecha(fila[13]) if len(fila) > 13 else ""  # Columna N (Índice 13)
             status = fila[16] if len(fila) > 16 else ""      # Columna Q (Índice 16)
-            type_inc = fila[3] if len(fila) > 3 else ""    # Columna D (Índice 3)
+            type_inc = fila[17] if len(fila) > 17 else ""    # Columna R (Índice 17)
             site = fila[4] if len(fila) > 4 else ""        # Columna E (Índice 4)
             envio = fila[15] if len(fila) > 15 else ""     # Columna P (Índice 15)
             folio = fila[14] if len(fila) > 14 else ""     # Columna O (Índice 14)
@@ -149,7 +149,7 @@ def buscar_pe_lost():
                 col_site = str(d["site"]).ljust(9)
                 col_qty = qty_str.ljust(5)
                 col_status = str(d["status"]).ljust(9)
-                col_type = str(d["type"]).ljust(27)
+                col_type = str(d["type"]).ljust(11)
                 col_envio = str(d["envio"]).ljust(13)
                 col_folio = str(d["folio"]).ljust(18)
 
