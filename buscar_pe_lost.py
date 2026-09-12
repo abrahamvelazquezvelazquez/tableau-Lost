@@ -1,5 +1,6 @@
 from collections import defaultdict
 from datetime import datetime
+import re
 import gspread
 from google.oauth2.service_account import Credentials
 
@@ -21,24 +22,46 @@ NOMBRE_HOJA_EXTERNA = "PE"
 
 
 def formatear_fecha(valor_fecha):
-    """Limpia y formatea las fechas a formato dd/mm/YYYY sin hora."""
+    """Limpia y formatea las fechas a dd/mm/YYYY ignorando completamente la hora."""
     if not valor_fecha:
         return ""
 
-    # 1. Limpiar espacios y tomar solo la fecha antes del espacio o de la 'T'
-    s_fecha = str(valor_fecha).strip().split(" ")[0].split("T")[0]
+    s_fecha = str(valor_fecha).strip()
 
-    # 2. Formatos comunes de solo fecha
-    formatos = ["%Y-%m-%d", "%d/%m/%Y", "%Y/%m/%d", "%d-%m-%Y"]
+    # 1. Intentar analizar con varios formatos de fecha (con y sin hora)
+    formatos = [
+        "%d/%m/%Y %H:%M:%S",    # 13/8/2026 18:49:52 o 01/08/2026 21:04:24
+        "%d/%m/%Y %I:%M:%S %p", # 13/8/2026 06:49:52 PM
+        "%d/%m/%Y",             # 13/8/2026
+        "%Y-%m-%d %H:%M:%S",    # 2026-08-13 18:49:52
+        "%Y-%m-%d",             # 2026-08-13
+        "%Y/%m/%d",             # 2026/08/13
+        "%d-%m-%Y",             # 13-08-2026
+    ]
 
     for fmt in formatos:
         try:
             dt = datetime.strptime(s_fecha, fmt)
-            return dt.strftime("%d/%m/%Y")
+            return dt.strftime("%d/%m/%Y")  # Devuelve la fecha formateada sin hora (ej: 01/08/2026)
         except ValueError:
             continue
 
-    return s_fecha
+    # 2. Respaldo (Fallback): Extraer únicamente la fecha mediante expresiones regulares
+    match = re.search(r"(\d{1,4}[/-]\d{1,2}[/-]\d{1,4})", s_fecha)
+    if match:
+        fecha_corta = match.group(1)
+        partes = re.split(r"[/-]", fecha_corta)
+        if len(partes) == 3:
+            # Si el primer elemento es el día/mes
+            if len(partes[0]) <= 2 and len(partes[2]) == 4:
+                dia, mes, anio = partes[0].zfill(2), partes[1].zfill(2), partes[2]
+                return f"{dia}/{mes}/{anio}"
+            # Si el año viene al inicio (YYYY-MM-DD)
+            elif len(partes[0]) == 4:
+                anio, mes, dia = partes[0], partes[1].zfill(2), partes[2].zfill(2)
+                return f"{dia}/{mes}/{anio}"
+
+    return s_fecha.split(" ")[0].split("T")[0]
 
 
 def buscar_pe_lost():
