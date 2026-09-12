@@ -13,11 +13,11 @@ creds = Credentials.from_service_account_file("credentials.json", scopes=SCOPES)
 client = gspread.authorize(creds)
 
 # 1. Configuración de Hoja Principal (Lost)
-URL_HOJA_PRINCIPAL = "https://docs.google.com/spreadsheets/d/1tLAyayZkAWJ0XtyQWWILutdQ_8sr7rjf1VsXxcAuL4M/edit"
+URL_HOJA_PRINCIPAL = "https://docs.google.com/spreadsheets/d/1tLAyayZkAWJ0XtyQWWILutdQ_8sr7rjf1VsXxcAuL4M/edit?gid=0#gid=0"
 NOMBRE_PESTAÑA_PRINCIPAL = "Seguimiento"
 
 # 2. Configuración de Hoja Externa con la pestaña PE (Tickets ICQA)
-URL_HOJA_EXTERNA = "https://docs.google.com/spreadsheets/d/1acrZZyBuvEjCQoMqlklzsvlZBFKHSfCo5zMPiNR-h0w/edit"
+URL_HOJA_EXTERNA = "https://docs.google.com/spreadsheets/d/1acrZzYBuvEjCQoMqIklzsvIZBfKHSfCo5zMPiNR-h0w/edit?gid=1973520692#gid=1973520692"
 NOMBRE_HOJA_EXTERNA = "PE"
 
 
