@@ -20,7 +20,6 @@ URL_HOJA_EXTERNA = "https://docs.google.com/spreadsheets/d/1acrZZyBuvEjCQoMqlklz
 NOMBRE_HOJA_EXTERNA = "PE"
 
 
-Python
 def formatear_fecha(valor_fecha):
     """Limpia y formatea las fechas a formato dd/mm/YYYY sin hora."""
     if not valor_fecha:
@@ -31,13 +30,11 @@ def formatear_fecha(valor_fecha):
 
     # 2. Formatos comunes de solo fecha
     formatos = ["%Y-%m-%d", "%d/%m/%Y", "%Y/%m/%d", "%d-%m-%Y"]
-    
+
     for fmt in formatos:
         try:
             dt = datetime.strptime(s_fecha, fmt)
-            # Retorna dd/mm/YYYY (ej: 12/09/2026)
-            # Usa "%d/%m/%y" si prefieres el año a 2 dígitos (ej: 12/09/26)
-            return dt.strftime("%d/%m/%Y") 
+            return dt.strftime("%d/%m/%Y")
         except ValueError:
             continue
 
