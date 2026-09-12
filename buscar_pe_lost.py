@@ -148,7 +148,7 @@ def buscar_pe_lost():
                 col_date = str(d["regDate"]).ljust(13)
                 col_site = str(d["site"]).ljust(9)
                 col_qty = qty_str.ljust(5)
-                col_status = str(d["status"]).ljust(28)
+                col_status = str(d["status"]).ljust(30)
                 col_type = str(d["type"]).ljust(27)
                 col_envio = str(d["envio"]).ljust(13)
                 col_folio = str(d["folio"]).ljust(18)
