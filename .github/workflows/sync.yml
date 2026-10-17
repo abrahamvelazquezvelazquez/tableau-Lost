@@ -1,4 +1,29 @@
-- name: Fetch Data from Google Sheets
+name: Sync Google Sheets Data
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '*/30 * * * *'
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install Dependencies
+        run: |
+          pip install gspread oauth2client
+
+      - name: Fetch Data from Google Sheets
         env:
           GCP_SA_KEY: ${{ secrets.GCP_CREDENTIALS }}
         run: |
@@ -11,11 +36,10 @@
           raw_key = os.environ.get('GCP_SA_KEY', '').strip()
 
           if not raw_key:
-              raise ValueError("Error: No se pudo leer la variable GCP_CREDENTIALS.")
+              raise ValueError("Error: No se encontro la clave GCP_CREDENTIALS en los secrets.")
 
           key_dict = json.loads(raw_key)
 
-          # Scopes actualizados para evitar errores de API 404
           scope = [
               'https://www.googleapis.com/auth/spreadsheets',
               'https://www.googleapis.com/auth/drive'
@@ -33,5 +57,13 @@
           with open('datos.js', 'w', encoding='utf-8') as f:
               f.write('window.handleDataResponse(' + json.dumps(records, ensure_ascii=False) + ');')
 
-          print("Sincronización exitosa. Registros procesados:", len(records))
+          print("Sincronizacion exitosa. Registros procesados:", len(records))
           EOF
+
+      - name: Commit and Push Updated Data
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add datos.json datos.js
+          git commit -m "Auto-update datos.json y datos.js" || exit 0
+          git push
