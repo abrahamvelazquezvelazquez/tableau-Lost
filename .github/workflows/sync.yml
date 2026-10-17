@@ -1,29 +1,4 @@
-name: Sync Google Sheets Data
-
-on:
-  workflow_dispatch:
-  schedule:
-    - cron: '*/30 * * * *'
-
-jobs:
-  sync:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.x'
-
-      - name: Install Dependencies
-        run: |
-          pip install gspread oauth2client
-
-      - name: Fetch Data from Google Sheets
+- name: Fetch Data from Google Sheets
         env:
           GCP_SA_KEY: ${{ secrets.GCP_CREDENTIALS }}
         run: |
@@ -33,33 +8,26 @@ jobs:
           import gspread
           from oauth2client.service_account import ServiceAccountCredentials
 
-          raw_key = os.environ.get('GCP_CREDENTIALS', '')
+          raw_key = os.environ.get('GCP_SA_KEY', '').strip()
+
+          if not raw_key:
+              raise ValueError("Error: No se pudo leer la variable GCP_CREDENTIALS de los Secrets de GitHub.")
+
           key_dict = json.loads(raw_key)
 
           scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
           creds = ServiceAccountCredentials.from_json_keyfile_dict(key_dict, scope)
           client = gspread.authorize(creds)
 
-          # ID CORREGIDO de la hoja de cálculo
           sheet_id = '1tLAyayZkAWJ0XtyQWWlUtdQ_8sr7rjf1VsXxCAuL4M'
           sheet = client.open_by_key(sheet_id).sheet1
           records = sheet.get_all_records()
 
-          # Guardar como JSON
           with open('datos.json', 'w', encoding='utf-8') as f:
               json.dump(records, f, ensure_ascii=False, indent=2)
 
-          # Guardar también como JS si prefieres usar window.handleDataResponse
           with open('datos.js', 'w', encoding='utf-8') as f:
               f.write('window.handleDataResponse(' + json.dumps(records, ensure_ascii=False) + ');')
 
           print("Sincronización exitosa. Registros procesados:", len(records))
           EOF
-
-      - name: Commit and Push Updated Data
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add datos.json datos.js
-          git commit -m "Auto-update datos.json y datos.js" || exit 0
-          git push
