@@ -1,54 +1,22 @@
-name: Sync Google Sheets Data
+- name: Fetch Data from Google Sheets
+  env:
+    GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
+  run: |
+    python - << 'EOF'
+    import os, json
+    import pandas as pd
+    import gspread
+    from oauth2client.service_account import ServiceAccountCredentials
 
-on:
-  schedule:
-    # Se ejecuta automáticamente cada 30 minutos
-    - cron: '*/30 * * * *'
-  workflow_dispatch: # Permite ejecutarlo manualmente cuando quieras
+    scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
+    key_dict = json.loads(os.environ['GCP_SA_KEY'])
+    creds = ServiceAccountCredentials.from_json_keyfile_dict(key_dict, scope)
+    client = gspread.authorize(creds)
 
-jobs:
-  sync:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v3
+    sheet_id = '1vSe0y0fqWb5y35DD4RiNjOsp9QLviTfhr-abCrIBgwPvYhbc7nSACny60URb7XKPCH2il5OLN9uZuGJ'
+    sheet = client.open_by_key(sheet_id).sheet1
 
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.x'
-
-      - name: Install Dependencies
-        run: |
-          pip install gspread oauth2client pandas
-
-      - name: Fetch Data from Google Sheets
-        env:
-          GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
-        run: |
-          python - << 'EOF'
-          import os, json
-          import pandas as pd
-          import gspread
-          from oauth2client.service_account import ServiceAccountCredentials
-
-          scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
-          key_dict = json.loads(os.environ['GCP_SA_KEY'])
-          creds = ServiceAccountCredentials.from_json_keyfile_dict(key_dict, scope)
-          client = gspread.authorize(creds)
-
-          sheet_id = '1vSe0y0fqWb5y35DD4RiNjOsp9QLviTfhr-abCrIBgwPvYhbc7nSACny60URb7XKPCH2il5OLN9uZuGJ'
-          sheet = client.open_by_key(sheet_id).sheet1
-
-          records = sheet.get_all_records()
-          with open('datos.json', 'w', encoding='utf-8') as f:
-              json.dump(records, f, ensure_ascii=False, indent=2)
-          EOF
-
-      - name: Commit and Push Updated Data
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add datos.json
-          git commit -m "Auto-update datos.json from Google Sheets" || exit 0
-          git push
+    records = sheet.get_all_records()
+    with open('datos.js', 'w', encoding='utf-8') as f:
+        f.write('window.handleDataResponse(' + json.dumps(records, ensure_ascii=False) + ');')
+    EOF
