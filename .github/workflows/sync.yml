@@ -23,7 +23,7 @@ jobs:
         with:
           python-version: '3.x'
 
-      - name: Build datos.js
+      - name: Build datos.js & datos.json
         run: |
           python - << 'EOF'
           import csv
@@ -35,6 +35,11 @@ jobs:
               for row in reader:
                   records.append(row)
 
+          # Guarda datos.json
+          with open('datos.json', 'w', encoding='utf-8') as f:
+              json.dump(records, f, ensure_ascii=False, indent=2)
+
+          # Guarda datos.js
           with open('datos.js', 'w', encoding='utf-8') as f:
               f.write('window.handleDataResponse(' + json.dumps(records, ensure_ascii=False) + ');')
           EOF
@@ -43,6 +48,6 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add datos.js
-          git commit -m "Auto-update datos.js" || exit 0
+          git add datos.json datos.js
+          git commit -m "Auto-update datos.js & datos.json" || exit 0
           git push
