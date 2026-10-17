@@ -25,7 +25,7 @@ jobs:
 
       - name: Fetch Data from Google Sheets
         env:
-          GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
+          GCP_SA_KEY: ${{ secrets.GCP_CREDENTIALS }}
         run: |
           python - << 'EOF'
           import os
@@ -33,7 +33,7 @@ jobs:
           import gspread
           from oauth2client.service_account import ServiceAccountCredentials
 
-          raw_key = os.environ.get('GCP_SA_KEY', '')
+          raw_key = os.environ.get('GCP_CREDENTIALS', '')
           key_dict = json.loads(raw_key)
 
           scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
