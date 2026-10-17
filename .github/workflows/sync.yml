@@ -14,40 +14,45 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Fetch CSV Data
-        run: |
-          curl -sL "https://docs.google.com/spreadsheets/d/e/2PACX-1vSe0y0fqWb5y35DD4RiNjOsp9QLviTfhr-abCrIBgwPvYhbc7nSACny60URb7XKPCH2il5OLN9uZuGJ/pub?gid=0&single=true&output=csv" -o datos.csv
-
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.x'
 
-      - name: Build datos.js & datos.json
+      - name: Install Dependencies
+        run: |
+          pip install gspread oauth2client
+
+      - name: Fetch Data from Google Sheets
+        env:
+          GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
         run: |
           python - << 'EOF'
-          import csv
-          import json
+          import os, json
+          import gspread
+          from oauth2client.service_account import ServiceAccountCredentials
 
-          records = []
-          with open('datos.csv', mode='r', encoding='utf-8') as f:
-              reader = csv.DictReader(f)
-              for row in reader:
-                  records.append(row)
+          # Cargar credenciales desde el secret
+          key_dict = json.loads(os.environ['GCP_SA_KEY'])
+          scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
+          creds = ServiceAccountCredentials.from_json_keyfile_dict(key_dict, scope)
+          client = gspread.authorize(creds)
 
-          # Guarda datos.json
-          with open('datos.json', 'w', encoding='utf-8') as f:
-              json.dump(records, f, ensure_ascii=False, indent=2)
+          # Abrir la hoja por su ID
+          sheet_id = '1vSe0y0fqWb5y35DD4RiNjOsp9QLviTfhr-abCrIBgwPvYhbc7nSACny60URb7XKPCH2il5OLN9uZuGJ'
+          sheet = client.open_by_key(sheet_id).sheet1
+          records = sheet.get_all_records()
 
-          # Guarda datos.js
+          # Escribir el archivo datos.js
           with open('datos.js', 'w', encoding='utf-8') as f:
               f.write('window.handleDataResponse(' + json.dumps(records, ensure_ascii=False) + ');')
+          print("Sincronización exitosa. Registros:", len(records))
           EOF
 
       - name: Commit and Push Updated Data
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add datos.json datos.js
-          git commit -m "Auto-update datos.js & datos.json" || exit 0
+          git add datos.js
+          git commit -m "Auto-update datos.js" || exit 0
           git push
