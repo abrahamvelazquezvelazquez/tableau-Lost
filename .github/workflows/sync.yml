@@ -14,34 +14,24 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Setup Python
+      - name: Fetch CSV Data
+        run: |
+          curl -sL "https://docs.google.com/spreadsheets/d/e/2PACX-1vSe0y0fqWb5y35DD4RiNjOsp9QLviTfhr-abCrIBgwPvYhbc7nSACny60URb7XKPCH2il5OLN9uZuGJ/pub?gid=0&single=true&output=csv" -o datos.csv
+
+      - name: Convert CSV to JS
         uses: actions/setup-python@v5
         with:
           python-version: '3.x'
 
-      - name: Install Dependencies
-        run: |
-          pip install gspread oauth2client pandas
-
-      - name: Fetch Data from Google Sheets
-        env:
-          GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
+      - name: Build datos.js
         run: |
           python - << 'EOF'
-          import os, json
           import pandas as pd
-          import gspread
-          from oauth2client.service_account import ServiceAccountCredentials
+          import json
 
-          scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
-          key_dict = json.loads(os.environ['GCP_SA_KEY'])
-          creds = ServiceAccountCredentials.from_json_keyfile_dict(key_dict, scope)
-          client = gspread.authorize(creds)
+          df = pd.read_csv('datos.csv')
+          records = df.fillna('').to_dict(orient='records')
 
-          sheet_id = '1vSe0y0fqWb5y35DD4RiNjOsp9QLviTfhr-abCrIBgwPvYhbc7nSACny60URb7XKPCH2il5OLN9uZuGJ'
-          sheet = client.open_by_key(sheet_id).sheet1
-
-          records = sheet.get_all_records()
           with open('datos.js', 'w', encoding='utf-8') as f:
               f.write('window.handleDataResponse(' + json.dumps(records, ensure_ascii=False) + ');')
           EOF
