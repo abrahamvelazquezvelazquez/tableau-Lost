@@ -33,7 +33,6 @@ jobs:
           import gspread
           from oauth2client.service_account import ServiceAccountCredentials
 
-          # Carga el JSON directamente desde la variable de entorno
           raw_key = os.environ.get('GCP_SA_KEY', '')
           key_dict = json.loads(raw_key)
 
@@ -41,10 +40,16 @@ jobs:
           creds = ServiceAccountCredentials.from_json_keyfile_dict(key_dict, scope)
           client = gspread.authorize(creds)
 
-          sheet_id = '1vSe0y0fqWb5y35DD4RiNjOsp9QLviTfhr-abCrIBgwPvYhbc7nSACny60URb7XKPCH2il5OLN9uZuGJ'
+          # ID CORREGIDO de la hoja de cálculo
+          sheet_id = '1tLAyayZkAWJ0XtyQWWlUtdQ_8sr7rjf1VsXxCAuL4M'
           sheet = client.open_by_key(sheet_id).sheet1
           records = sheet.get_all_records()
 
+          # Guardar como JSON
+          with open('datos.json', 'w', encoding='utf-8') as f:
+              json.dump(records, f, ensure_ascii=False, indent=2)
+
+          # Guardar también como JS si prefieres usar window.handleDataResponse
           with open('datos.js', 'w', encoding='utf-8') as f:
               f.write('window.handleDataResponse(' + json.dumps(records, ensure_ascii=False) + ');')
 
@@ -55,6 +60,6 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add datos.js
-          git commit -m "Auto-update datos.js" || exit 0
+          git add datos.json datos.js
+          git commit -m "Auto-update datos.json y datos.js" || exit 0
           git push
