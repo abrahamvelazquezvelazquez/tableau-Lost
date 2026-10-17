@@ -23,21 +23,22 @@ jobs:
         run: |
           pip install gspread oauth2client
 
-      - name: Decode SA Key File
-        env:
-          GCP_SA_KEY_B64: ${{ secrets.GCP_SA_KEY }}
-        run: |
-          echo "$GCP_SA_KEY_B64" | base64 --decode > sa_key.json
-
       - name: Fetch Data from Google Sheets
+        env:
+          GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
         run: |
           python - << 'EOF'
+          import os
           import json
           import gspread
           from oauth2client.service_account import ServiceAccountCredentials
 
+          # Carga el JSON directamente desde la variable de entorno
+          raw_key = os.environ.get('GCP_SA_KEY', '')
+          key_dict = json.loads(raw_key)
+
           scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
-          creds = ServiceAccountCredentials.from_json_keyfile_name('sa_key.json', scope)
+          creds = ServiceAccountCredentials.from_json_keyfile_dict(key_dict, scope)
           client = gspread.authorize(creds)
 
           sheet_id = '1vSe0y0fqWb5y35DD4RiNjOsp9QLviTfhr-abCrIBgwPvYhbc7nSACny60URb7XKPCH2il5OLN9uZuGJ'
@@ -47,12 +48,8 @@ jobs:
           with open('datos.js', 'w', encoding='utf-8') as f:
               f.write('window.handleDataResponse(' + json.dumps(records, ensure_ascii=False) + ');')
 
-          print("Sincronización exitosa. Total registros:", len(records))
+          print("Sincronización exitosa. Registros procesados:", len(records))
           EOF
-
-      - name: Cleanup SA Key File
-        run: |
-          rm -f sa_key.json
 
       - name: Commit and Push Updated Data
         run: |
