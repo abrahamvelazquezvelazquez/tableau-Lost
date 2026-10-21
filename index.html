@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pending Lost MWH - MXRC03</title>
+  
+  <!-- Tailwind CSS & Inter Font -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Chart.js para gráficos -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .glass-card {
+      background: rgba(30, 41, 59, 0.7);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen pb-12">
+
+  <!-- Header principal -->
+  <header class="border-b border-slate-800 bg-slate-900/80 sticky top-0 z-50 backdrop-blur-md px-6 py-4">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="bg-blue-600 text-white font-bold p-2.5 rounded-xl shadow-lg shadow-blue-500/20">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-xl font-bold tracking-tight text-white">Pending Lost MWH</h1>
+            <span class="bg-blue-500/10 text-blue-400 text-xs font-semibold px-2.5 py-0.5 rounded-full border border-blue-500/20">MXRC03</span>
+          </div>
+          <p class="text-xs text-slate-400">Control de inventario perdido, trazabilidad y seguimiento en tiempo real</p>
+        </div>
+      </div>
+
+      <!-- Estado de conexión -->
+      <div class="flex items-center gap-3">
+        <div id="status-indicator" class="flex items-center gap-2 bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-700 text-xs text-slate-300">
+          <span class="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse"></span>
+          <span id="status-text">Buscando datos.js...</span>
+        </div>
+        <button onclick="window.location.reload()" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-medium px-3.5 py-2 rounded-lg transition-all shadow-lg shadow-blue-600/20">
+          Actualizar
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-6 mt-6 space-y-6">
+
+    <!-- Tarjetas KPI -->
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+      <div class="glass-card p-4 rounded-xl">
+        <p class="text-xs font-medium text-slate-400">Pzs Losteadas</p>
+        <p id="kpi-pzs-lost" class="text-2xl font-bold text-white mt-1">0</p>
+        <span class="text-[10px] text-slate-500">Total Piezas</span>
+      </div>
+      <div class="glass-card p-4 rounded-xl">
+        <p class="text-xs font-medium text-slate-400">Total Losteado</p>
+        <p id="kpi-usd-lost" class="text-2xl font-bold text-emerald-400 mt-1">$0</p>
+        <span class="text-[10px] text-slate-500">Monto Acumulado</span>
+      </div>
+      <div class="glass-card p-4 rounded-xl">
+        <p class="text-xs font-medium text-slate-400">Pzs Pendientes</p>
+        <p id="kpi-pzs-pend" class="text-2xl font-bold text-amber-400 mt-1">0</p>
+        <span class="text-[10px] text-slate-500">En Revisión</span>
+      </div>
+      <div class="glass-card p-4 rounded-xl">
+        <p class="text-xs font-medium text-slate-400">USD Pendiente</p>
+        <p id="kpi-usd-pend" class="text-2xl font-bold text-amber-400 mt-1">$0</p>
+        <span class="text-[10px] text-slate-500">Valor Por Conciliar</span>
+      </div>
+      <div class="glass-card p-4 rounded-xl">
+        <p class="text-xs font-medium text-slate-400">Pzs Seguimiento</p>
+        <p id="kpi-pzs-seg" class="text-2xl font-bold text-blue-400 mt-1">0</p>
+        <span class="text-[10px] text-slate-500">Con Ticket Activo</span>
+      </div>
+      <div class="glass-card p-4 rounded-xl">
+        <p class="text-xs font-medium text-slate-400">USD Seguimiento</p>
+        <p id="kpi-usd-seg" class="text-2xl font-bold text-blue-400 mt-1">$0</p>
+        <span class="text-[10px] text-slate-500">En Gestión</span>
+      </div>
+    </div>
+
+    <!-- Sección de Gráficos -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div class="glass-card p-4 rounded-xl">
+        <h3 class="text-sm font-semibold text-slate-200 mb-3">Análisis por Estado</h3>
+        <div class="h-48"><canvas id="chartAnalisis"></canvas></div>
+      </div>
+      <div class="glass-card p-4 rounded-xl">
+        <h3 class="text-sm font-semibold text-slate-200 mb-3">Distribución Rango USD</h3>
+        <div class="h-48"><canvas id="chartRangoUsd"></canvas></div>
+      </div>
+      <div class="glass-card p-4 rounded-xl">
+        <h3 class="text-sm font-semibold text-slate-200 mb-3">Categoría HV</h3>
+        <div class="h-48"><canvas id="chartCategoria"></canvas></div>
+      </div>
+      <div class="glass-card p-4 rounded-xl">
+        <h3 class="text-sm font-semibold text-slate-200 mb-3">Próximo a Pago</h3>
+        <div class="h-48"><canvas id="chartProximoPago"></canvas></div>
+      </div>
+    </div>
+
+    <!-- Tabla de Seguimiento Relevante -->
+    <div class="glass-card rounded-xl p-5 overflow-hidden">
+      <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
+        <div>
+          <h2 class="text-base font-bold text-white">Seguimiento Relevante</h2>
+          <p class="text-xs text-slate-400">Detalle de ítems críticos cargados en tiempo real</p>
+        </div>
+        <input type="text" id="table-search" placeholder="Buscar por Meli, Título, Issue..." class="bg-slate-900 border border-slate-700 text-slate-200 text-xs rounded-lg px-3 py-2 w-64 focus:outline-none focus:border-blue-500">
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs text-slate-300">
+          <thead class="bg-slate-900/80 uppercase text-[10px] text-slate-400 tracking-wider">
+            <tr>
+              <th class="p-3">Aging</th>
+              <th class="p-3">Issue</th>
+              <th class="p-3">Meli</th>
+              <th class="p-3">Título</th>
+              <th class="p-3">Ubicación</th>
+              <th class="p-3">Qty Pending</th>
+              <th class="p-3">USD Pending</th>
+              <th class="p-3">Análisis</th>
+            </tr>
+          </thead>
+          <tbody id="table-body" class="divide-y divide-slate-800">
+            <tr>
+              <td colspan="8" class="text-center py-6 text-slate-500">Esperando carga de datos...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Script para conectar con datos.js -->
+  <script src="datos.js" onerror="handleDataError()"></script>
+  
+  <script>
+    // Respaldo de datos demo por si aún no se genera el datos.js en local
+    const DEMO_DATA = [
+      { Aging: 1, Issue: 20000019099813, Meli: "QQSL91354", Título: "Starlink Kit De Internet Satelital Extender 4 X - Blanco", Ubicación: "MU-TT-NT-395-051", Qty_pending: 46, USD_Pending: 18719.15, Análisis: "Seguimiento CCM" },
+      { Aging: 1, Issue: 20000019099779, Meli: "KJAU27113", Título: "Ventilador De Techo Moderno Con Luz Y Control Remoto", Ubicación: "MU-TT-NT-55F-01B", Qty_pending: 68, USD_Pending: 2291.78, Análisis: "Seguimiento CCM" },
+      { Aging: 8, Issue: 20000018829949, Meli: "XZEM60985", Título: "Hidrolavadora Electrica Portatil Con Ruedas 1600 Psi", Ubicación: "MU-TT-NT-38E-C30", Qty_pending: 44, USD_Pending: 2187.84, Análisis: "Inflación de IS" },
+      { Aging: 4, Issue: 20000018903789, Meli: "GXRE19705", Título: "Adaptador De Corriente Apple Usb C 20w Color Blanco", Ubicación: "MU-TT-FF-4D8-E58", Qty_pending: 72, USD_Pending: 1708.88, Análisis: "Producto localizado" }
+    ];
+
+    let datasetActual = [];
+
+    // Se ejecuta al cargar la página
