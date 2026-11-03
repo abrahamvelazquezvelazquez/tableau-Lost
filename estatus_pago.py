@@ -9,7 +9,7 @@ SCOPES = [
 creds = Credentials.from_service_account_file("credentials.json", scopes=SCOPES)
 client = gspread.authorize(creds)
 
-# Configuración de la Hoja Principal
+# Configuración de la Hoja Principal (ID extraído de la URL en la imagen)
 ID_HOJA_PRINCIPAL = "1tLAyayZkAWJ0XtyQWWILutdQ_8sr7rjf1VsXxcAuL4M"
 NOMBRE_PESTAÑA_PRINCIPAL = "Seguimiento"
 
@@ -60,63 +60,28 @@ def actualizar_estatus():
     # 2. Leer valores de las columnas desde la fila 2
     vals_qty = sheet.col_values(col_qty_pending)[1:]
     vals_pagadas = sheet.col_values(col_piezas_pagadas)[1:]
-    vals_estatus_actual = sheet.col_values(col_estatus)[1:]
 
-    num_rows = max(len(vals_qty), len(vals_pagadas), len(vals_estatus_actual))
+    num_rows = max(len(vals_qty), len(vals_pagadas))
     if num_rows == 0:
         print("No hay filas para procesar.")
         return
 
-    # Alinear longitudes de las listas
     while len(vals_qty) < num_rows:
         vals_qty.append("")
     while len(vals_pagadas) < num_rows:
         vals_pagadas.append("")
-    while len(vals_estatus_actual) < num_rows:
-        vals_estatus_actual.append("")
 
-    # 3. Calcular el valor de Estatus solo para las filas "PENDIENTE"
+    # 3. Calcular el valor de Estatus según las reglas requeridas
     output_estatus = []
-    filas_modificadas = 0
 
     for i in range(num_rows):
-        current_status = str(vals_estatus_actual[i]).strip()
+        val_z = parse_float(vals_qty[i])
+        val_ad = parse_float(vals_pagadas[i])
 
-        # Solo se recalculan las filas cuyo estatus actual sea "PENDIENTE"
-        if current_status.upper() == "PENDIENTE":
-            val_qty = parse_float(vals_qty[i])
-            val_pagadas = parse_float(vals_pagadas[i])
-
-            if val_qty >= 1:
-                estatus_str = "PENDIENTE"
-            else:
-                # Qty pending es 0 o vacío
-                if val_pagadas >= 1:
-                    estatus_str = "PAGADA"
-                else:
-                    estatus_str = "CONCILIADA"
-
-            if estatus_str != current_status:
-                filas_modificadas += 1
-
-            output_estatus.append([estatus_str])
+        if val_z >= 1:
+            estatus_str = "PENDIENTE"
         else:
-            # Si dice cualquier otra cosa (PAGADA, CONCILIADA, etc.), se conserva exactamente igual
-            output_estatus.append([current_status])
-
-    # 4. Escribir masivamente en la columna Estatus
-    fila_inicio = 2
-    fila_fin = fila_inicio + num_rows - 1
-
-    col_letter = gspread.utils.rowcol_to_a1(1, col_estatus)[:-1]
-    range_a1 = f"{col_letter}{fila_inicio}:{col_letter}{fila_fin}"
-
-    sheet.update(values=output_estatus, range_name=range_a1)
-    print(
-        f"Proceso finalizado: se revisaron {num_rows} filas. "
-        f"Se cambiaron {filas_modificadas} filas que estaban en 'PENDIENTE'."
-    )
-
-
-if __name__ == "__main__":
-    actualizar_estatus()
+            # Z es 0 o nulo
+            if val_ad >= 1:
+                estatus_str = "PAGADA"  # O "PAGADO" según se requiera
+            else:
