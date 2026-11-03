@@ -19,15 +19,18 @@ EXTERNAL_SHEET_NAME = "Extracto 1"
 
 def parse_number(val):
     """Convierte un valor de texto a float o int si es numérico
+
     para evitar el apóstrofe (') al escribir en Google Sheets.
     """
     if val is None or str(val).strip() == "":
         return ""
     try:
+        # Elimina comas de separadores de miles o espacios si existieran
         clean_val = str(val).replace(",", "").strip()
         num = float(clean_val)
         return int(num) if num.is_integer() else num
     except ValueError:
+        # Si no se puede convertir a número (ej. texto), devuelve el valor original
         return val
 
 
@@ -36,11 +39,10 @@ def issues_pendientes_lost():
     ss_principal = client.open_by_key(ID_HOJA_PRINCIPAL)
     sheet = ss_principal.worksheet(NOMBRE_PESTAÑA_PRINCIPAL)
 
-    # Buscar índices de columnas 'MXN Pending', 'Qty pending' y 'Estatus' en la fila 1
+    # Buscar índices de columnas 'MXN Pending' y 'Qty pending' en la fila 1
     encabezados = sheet.row_values(1)
     col_mxn_index = 0
     col_qty_index = 0
-    col_estatus_index = 0
 
     for idx, header in enumerate(encabezados):
         clean_header = " ".join(str(header).split()).lower()
@@ -48,23 +50,14 @@ def issues_pendientes_lost():
             col_mxn_index = idx + 1
         elif clean_header == "qty pending":
             col_qty_index = idx + 1
-        elif clean_header in ["estatus", "status"]:
-            col_estatus_index = idx + 1
 
-    # Validar que existan todos los encabezados requeridos
-    faltantes = []
-    if col_mxn_index == 0:
-        faltantes.append("'MXN Pending'")
-    if col_qty_index == 0:
-        faltantes.append("'Qty pending'")
-    if col_estatus_index == 0:
-        faltantes.append("'Estatus'")
-
-    if faltantes:
-        print(f"Error: No se encontró(aron) el/los encabezado(s): {', '.join(faltantes)} en la fila 1.")
+    if col_mxn_index == 0 or col_qty_index == 0:
+        print(
+            "Error: No se encontró uno o ambos encabezados ('MXN Pending', 'Qty pending') en la fila 1."
+        )
         return
 
-    # Leer Columna E (Columna 5: Issue IDs) desde la fila 2
+    # Leer Columna E local (Columna 5) desde la fila 2
     col_e_values = sheet.col_values(5)
     col_i = col_e_values[1:] if len(col_e_values) > 1 else []
 
@@ -72,29 +65,7 @@ def issues_pendientes_lost():
         print("No hay filas para procesar en la Columna E.")
         return
 
-    num_rows = len(col_i)
-    fila_inicio = 2
-    fila_fin = fila_inicio + num_rows - 1
-
-    # Leer la columna dinámica de Estatus
-    col_estatus_values = sheet.col_values(col_estatus_index)
-    estatus_list = col_estatus_values[1:] if len(col_estatus_values) > 1 else []
-
-    # Leer los valores existentes en las columnas destino para no sobreescribir lo ya procesado
-    col_letter_mxn = gspread.utils.rowcol_to_a1(1, col_mxn_index)[:-1]
-    col_letter_qty = gspread.utils.rowcol_to_a1(1, col_qty_index)[:-1]
-
-    existing_mxn_raw = sheet.get(f"{col_letter_mxn}{fila_inicio}:{col_letter_mxn}{fila_fin}")
-    existing_qty_raw = sheet.get(f"{col_letter_qty}{fila_inicio}:{col_letter_qty}{fila_fin}")
-
-    # Normalizar listas de valores existentes para que tengan la misma longitud que col_i
-    current_mxn = [row[0] if row else "" for row in existing_mxn_raw]
-    current_mxn += [""] * (num_rows - len(current_mxn))
-
-    current_qty = [row[0] if row else "" for row in existing_qty_raw]
-    current_qty += [""] * (num_rows - len(current_qty))
-
-    # 2. Abrir hoja externa y generar lookup table
+    # 2. Abrir hoja externa y leer datos
     ext_ss = client.open_by_key(EXTERNAL_ID)
     ext_sheet = ext_ss.worksheet(EXTERNAL_SHEET_NAME)
     data_ext = ext_sheet.get_all_values()
@@ -103,6 +74,7 @@ def issues_pendientes_lost():
         print("La hoja externa no contiene datos.")
         return
 
+    # Crear mapa de búsqueda
     lookup = {}
     for row in data_ext[1:]:
         if len(row) > 3:
@@ -112,51 +84,46 @@ def issues_pendientes_lost():
                 col_f_ext = row[6] if len(row) > 6 else ""  # Columna G externa
                 lookup[key] = {"colE": col_e_ext, "colF": col_f_ext}
 
-    # 3. Procesar resultados respetando los datos existentes
+    # 3. Preparar arreglos de resultados parseando números
     output_mxn = []
     output_qty = []
-    filas_procesadas = 0
 
-    for idx, item in enumerate(col_i):
-        # Tomar el estatus de la columna identificada dinámicamente
-        status = str(estatus_list[idx]).strip().upper() if idx < len(estatus_list) else ""
+    for item in col_i:
+        key = str(item).strip() if item is not None else ""
 
-        # Procesa si dice PENDIENTE o si la celda está completamente vacía
-        if status in ["PENDIENTE", ""]:
-            filas_procesadas += 1
-            key = str(item).strip() if item is not None else ""
-
-            if key in lookup:
-                match = lookup[key]
-                output_mxn.append([parse_number(match["colF"])])
-                output_qty.append([parse_number(match["colE"])])
-            else:
-                # Si está pendiente o vacía pero aún no se encuentra en el extracto,
-                # mantiene el contenido actual que ya tenía la celda
-                output_mxn.append([current_mxn[idx]])
-                output_qty.append([current_qty[idx]])
+        if key in lookup:
+            match = lookup[key]
+            output_mxn.append([parse_number(match["colF"])])
+            output_qty.append([parse_number(match["colE"])])
         else:
-            # Si contiene cualquier otro texto (CONCILIADA, PAGADA, etc.), conserva el valor previo
-            output_mxn.append([current_mxn[idx]])
-            output_qty.append([current_qty[idx]])
+            output_mxn.append([""])
+            output_qty.append([""])
 
-    # 4. Actualizar columnas completas en bloque
+    # 4. Escribir resultados en las columnas correspondientes
+    num_rows = len(col_i)
+    fila_inicio = 2
+    fila_fin = fila_inicio + num_rows - 1
+
+    # MXN Pending
+    col_letter_mxn = gspread.utils.rowcol_to_a1(1, col_mxn_index)[:-1]
+    range_mxn = f"{col_letter_mxn}{fila_inicio}:{col_letter_mxn}{fila_fin}"
     sheet.update(
-        range_name=f"{col_letter_mxn}{fila_inicio}:{col_letter_mxn}{fila_fin}",
+        range_name=range_mxn,
         values=output_mxn,
         value_input_option="USER_ENTERED",
     )
 
+    # Qty pending
+    col_letter_qty = gspread.utils.rowcol_to_a1(1, col_qty_index)[:-1]
+    range_qty = f"{col_letter_qty}{fila_inicio}:{col_letter_qty}{fila_fin}"
     sheet.update(
-        range_name=f"{col_letter_qty}{fila_inicio}:{col_letter_qty}{fila_fin}",
+        range_name=range_qty,
         values=output_qty,
         value_input_option="USER_ENTERED",
     )
 
-    col_letter_estatus = gspread.utils.rowcol_to_a1(1, col_estatus_index)[:-1]
     print(
-        f"Proceso finalizado: columna de estatus detectada en '{col_letter_estatus}'. "
-        f"Se evaluaron {num_rows} filas ({filas_procesadas} eran 'PENDIENTE' o estaban vacías)."
+        f"Se actualizaron {num_rows} filas en 'MXN Pending' y 'Qty pending' de Issues Pendientes Lost exitosamente."
     )
 
 
