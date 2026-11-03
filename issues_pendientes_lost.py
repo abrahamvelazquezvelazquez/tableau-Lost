@@ -115,14 +115,15 @@ def issues_pendientes_lost():
     # 3. Procesar resultados respetando los datos existentes
     output_mxn = []
     output_qty = []
-    pendientes_procesados = 0
+    filas_procesadas = 0
 
     for idx, item in enumerate(col_i):
         # Tomar el estatus de la columna identificada dinámicamente
         status = str(estatus_list[idx]).strip().upper() if idx < len(estatus_list) else ""
 
-        if status == "PENDIENTE":
-            pendientes_procesados += 1
+        # Procesa si dice PENDIENTE o si la celda está completamente vacía
+        if status in ["PENDIENTE", ""]:
+            filas_procesadas += 1
             key = str(item).strip() if item is not None else ""
 
             if key in lookup:
@@ -130,13 +131,34 @@ def issues_pendientes_lost():
                 output_mxn.append([parse_number(match["colF"])])
                 output_qty.append([parse_number(match["colE"])])
             else:
-                # Si está pendiente pero aún no se encuentra en el extracto,
+                # Si está pendiente o vacía pero aún no se encuentra en el extracto,
                 # mantiene el contenido actual que ya tenía la celda
                 output_mxn.append([current_mxn[idx]])
                 output_qty.append([current_qty[idx]])
         else:
-            # Si no es "PENDIENTE", conserva exactamente el valor previo
+            # Si contiene cualquier otro texto (CONCILIADA, PAGADA, etc.), conserva el valor previo
             output_mxn.append([current_mxn[idx]])
             output_qty.append([current_qty[idx]])
 
-    # 4. Actualizar columnas completas en
+    # 4. Actualizar columnas completas en bloque
+    sheet.update(
+        range_name=f"{col_letter_mxn}{fila_inicio}:{col_letter_mxn}{fila_fin}",
+        values=output_mxn,
+        value_input_option="USER_ENTERED",
+    )
+
+    sheet.update(
+        range_name=f"{col_letter_qty}{fila_inicio}:{col_letter_qty}{fila_fin}",
+        values=output_qty,
+        value_input_option="USER_ENTERED",
+    )
+
+    col_letter_estatus = gspread.utils.rowcol_to_a1(1, col_estatus_index)[:-1]
+    print(
+        f"Proceso finalizado: columna de estatus detectada en '{col_letter_estatus}'. "
+        f"Se evaluaron {num_rows} filas ({filas_procesadas} eran 'PENDIENTE' o estaban vacías)."
+    )
+
+
+if __name__ == "__main__":
+    issues_pendientes_lost()
