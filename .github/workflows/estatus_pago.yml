@@ -2,7 +2,7 @@ name: Actualizador Estatus Pago (15 min)
 
 on:
   schedule:
-    - cron: '*/15 * * * *'  # Se ejecuta cada 15 minutos
+    - cron: '*/30 * * * *'  # Se ejecuta cada 15 minutos
   workflow_dispatch:
 
 jobs:
