@@ -30,6 +30,7 @@
       padding-bottom: 40px;
     }
 
+    /* TOPBAR CORPORATIVO */
     .topbar {
       background: linear-gradient(90deg, #0F172A 0%, #1E293B 100%);
       border-bottom: 1px solid var(--border-color);
@@ -64,6 +65,23 @@
 
     .topbar-controls { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 
+    .btn-report {
+      background: var(--accent-yellow);
+      color: #0F172A;
+      border: none;
+      padding: 9px 15px;
+      border-radius: 8px;
+      font-size: 12.5px;
+      font-weight: 800;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 12px rgba(255, 230, 0, 0.2);
+      transition: transform 0.15s, background 0.2s;
+    }
+    .btn-report:hover { background: #f2da00; transform: translateY(-1px); }
+
     .btn-refresh {
       background: var(--accent-blue);
       color: #FFFFFF;
@@ -92,6 +110,7 @@
     }
     .btn-clear:hover { background: #EF4444; border-color: #EF4444; color: #FFFFFF; }
 
+    /* CONTENEDOR Y MULTIFILTROS */
     .container {
       max-width: 1480px;
       margin: 0 auto;
@@ -208,6 +227,7 @@
       font-size: 13px;
     }
 
+    /* GRÁFICAS Y KPIS */
     .top-analytics-grid {
       display: grid;
       grid-template-columns: 1.55fr 1fr;
@@ -287,6 +307,7 @@
 
     .grid-2-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
 
+    /* TABLAS EJECUTIVAS Y ENLACES WMS */
     .table-wrapper {
       overflow-x: auto;
       max-height: 410px;
@@ -321,14 +342,34 @@
     tbody tr.clickable-tote { cursor: pointer; transition: background 0.15s; }
     tbody tr.clickable-tote:hover { background: rgba(59, 130, 246, 0.18) !important; }
 
+    .wms-link {
+      color: #60A5FA;
+      font-weight: 700;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .wms-link:hover { color: var(--accent-yellow); }
+
+    .wms-link-sku {
+      color: #34D399;
+      font-weight: 700;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    .wms-link-sku:hover { color: var(--accent-yellow); }
+
     .tote-link { color: #60A5FA; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
     .num-right { text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; white-space: nowrap; }
 
+    /* MODALES (DETALLE TOTE Y REPORTE DE CORREO) */
     .modal-backdrop {
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(2, 6, 23, 0.82);
+      background: rgba(2, 6, 23, 0.85);
       backdrop-filter: blur(4px);
       z-index: 100;
       justify-content: center;
@@ -342,11 +383,11 @@
       border-top: 4px solid var(--accent-yellow);
       border-radius: 14px;
       width: 100%;
-      max-width: 1180px;
-      max-height: 88vh;
+      max-width: 1200px;
+      max-height: 90vh;
       display: flex;
       flex-direction: column;
-      box-shadow: 0 25px 50px rgba(0,0,0,0.6);
+      box-shadow: 0 25px 50px rgba(0,0,0,0.65);
     }
 
     .modal-header {
@@ -355,6 +396,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      gap: 12px;
     }
     .modal-header h2 { margin: 0; font-size: 17px; color: #FFFFFF; }
     .modal-header p { margin: 3px 0 0; font-size: 12px; color: var(--text-secondary); }
@@ -382,7 +424,76 @@
     .m-stat strong { display: block; font-size: 16px; color: #FFFFFF; margin-top: 2px; }
 
     .modal-body { padding: 16px 22px; overflow-y: auto; }
-    .badge-status { padding: 3px 8px; border-radius: 4px; font-size: 10.5px; font-weight: 700; background: rgba(59, 130, 246, 0.15); color: #93C5FD; }
+
+    .badge-status-link {
+      padding: 4px 9px;
+      border-radius: 5px;
+      font-size: 10.5px;
+      font-weight: 800;
+      background: rgba(245, 158, 11, 0.2);
+      color: #FBBF24;
+      border: 1px solid rgba(245, 158, 11, 0.45);
+      text-decoration: none;
+      display: inline-block;
+    }
+    .badge-status-link:hover {
+      background: var(--accent-yellow);
+      color: #0F172A;
+    }
+
+    /* ESTILOS DEL BORRADOR DE CORREO CORPORATIVO */
+    .email-preview-container {
+      background: #FFFFFF;
+      color: #1E293B;
+      border-radius: 10px;
+      padding: 24px 28px;
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 13.5px;
+      line-height: 1.6;
+      box-shadow: inset 0 2px 6px rgba(0,0,0,0.08);
+    }
+
+    .email-actions-bar {
+      display: flex;
+      gap: 12px;
+      padding: 14px 22px;
+      background: var(--bg-card-alt);
+      border-bottom: 1px solid var(--border-color);
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .btn-copy-rich {
+      background: var(--accent-emerald);
+      color: #FFFFFF;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-copy-rich:hover { background: #059669; }
+
+    .btn-open-gmail {
+      background: var(--accent-blue);
+      color: #FFFFFF;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-open-gmail:hover { background: #2563EB; }
 
     #loading-overlay {
       position: fixed;
@@ -430,6 +541,7 @@
     </div>
   </div>
   <div class="topbar-controls">
+    <button class="btn-report" onclick="abrirModalReporte()">✉️ Generar reporte</button>
     <button class="btn-refresh" onclick="cargarDatos()">🔄 Actualizar Datos</button>
     <button class="btn-clear" onclick="limpiarTodosLosFiltros()">🗑️ Limpiar Multifiltros</button>
   </div>
@@ -446,10 +558,9 @@
     <div id="pills-list" style="display:flex; flex-wrap:wrap; gap:8px;"></div>
   </section>
 
-  <!-- BLOQUE 1: 4 DONAS EN USD PENDING ($) + KPIs + SEGUIMIENTO TOTAL EN USD PENDING ($) -->
+  <!-- BLOQUE 1: 4 DONAS EN USD PENDING ($) + KPIs + SEGUIMIENTO TOTAL -->
   <section class="top-analytics-grid">
     <div class="donuts-quad">
-      <!-- Gráfica 1: Análisis en USD Pending ($) -->
       <div class="mini-chart-box">
         <div class="chart-header">
           <div class="chart-title-row">
@@ -461,65 +572,61 @@
         <div class="canvas-wrap-donut"><canvas id="chartAnalisis"></canvas></div>
       </div>
 
-      <!-- Gráfica 2: Rango USD en USD Pending ($) -->
       <div class="mini-chart-box">
         <div class="chart-header">
           <div class="chart-title-row">
             <h3 class="chart-title">Rango USD</h3>
             <span class="tag">USD Pending ($)</span>
           </div>
-          <div class="chart-desc">Total <strong>USD Pending ($)</strong> según clasificación de <strong>Rango</strong> (Col. U)</div>
+          <div class="chart-desc">Total <strong>USD Pending ($)</strong> según clasificación de <strong>Rango</strong> (Col. V)</div>
         </div>
         <div class="canvas-wrap-donut"><canvas id="chartRango"></canvas></div>
       </div>
 
-      <!-- Gráfica 3: Categoría HV en USD Pending ($) -->
       <div class="mini-chart-box">
         <div class="chart-header">
           <div class="chart-title-row">
             <h3 class="chart-title">Categoría (HV)</h3>
             <span class="tag">USD Pending ($)</span>
           </div>
-          <div class="chart-desc">Total <strong>USD Pending ($)</strong> únicamente con valores de <strong>HV</strong> (Col. L)</div>
+          <div class="chart-desc">Total <strong>USD Pending ($)</strong> únicamente con valores de <strong>HV</strong> (Col. N)</div>
         </div>
         <div class="canvas-wrap-donut"><canvas id="chartHV"></canvas></div>
       </div>
 
-      <!-- Gráfica 4: Próximo a pago en USD Pending ($) con Fecha de Pago -->
       <div class="mini-chart-box">
         <div class="chart-header">
           <div class="chart-title-row">
             <h3 class="chart-title">Próximo a pago</h3>
             <span class="tag">USD Pending ($)</span>
           </div>
-          <div class="chart-desc"><strong>USD Pending ($)</strong> por <strong>Análisis</strong> donde existe <strong>Fecha de pago</strong> (Col. Z)</div>
+          <div class="chart-desc"><strong>USD Pending ($)</strong> por <strong>Análisis</strong> donde existe <strong>Fecha de pago</strong> (Col. AA)</div>
         </div>
         <div class="canvas-wrap-donut"><canvas id="chartProximoPago"></canvas></div>
       </div>
     </div>
 
-    <!-- Tarjetas KPI y Gráfica 5: Seguimiento total en USD Pending ($) -->
     <div class="kpi-panel">
       <div class="kpi-grid">
         <div class="kpi-card">
           <div class="kpi-label">Pzs losteadas</div>
           <div class="kpi-value" id="kpi-pzs-lost">0</div>
-          <div class="kpi-sub">Suma Qty inicial (Col. J)</div>
+          <div class="kpi-sub">Suma Qty inicial (Col. L)</div>
         </div>
         <div class="kpi-card">
           <div class="kpi-label">Total losteado</div>
           <div class="kpi-value" id="kpi-usd-lost">$0</div>
-          <div class="kpi-sub">Suma USD Inicial (Col. P)</div>
+          <div class="kpi-sub">Suma USD Inicial (Col. Q)</div>
         </div>
         <div class="kpi-card amber">
           <div class="kpi-label">Pzs pendientes</div>
           <div class="kpi-value" id="kpi-pzs-pend">0</div>
-          <div class="kpi-sub">Suma Qty pending (Col. X)</div>
+          <div class="kpi-sub">Suma Qty pending (Col. Y)</div>
         </div>
         <div class="kpi-card amber">
           <div class="kpi-label">USD pendiente</div>
           <div class="kpi-value" id="kpi-usd-pend">$0</div>
-          <div class="kpi-sub">Suma USD Pending (Col. V)</div>
+          <div class="kpi-sub">Suma USD Pending (Col. X)</div>
         </div>
         <div class="kpi-card emerald">
           <div class="kpi-label">Pzs seguimiento</div>
@@ -546,7 +653,7 @@
     </div>
   </section>
 
-  <!-- BLOQUE 2: AGING Y PRÓXIMAS A PAGO POR SEMANA EN USD PENDING ($) -->
+  <!-- BLOQUE 2: AGING Y PRÓXIMAS A PAGO POR SEMANA -->
   <section class="grid-2-cols">
     <div class="card-full">
       <div class="chart-header">
@@ -554,7 +661,7 @@
           <h3 class="chart-title">Aging (Días de antigüedad)</h3>
           <span class="tag">USD Pending ($)</span>
         </div>
-        <div class="chart-desc">Suma de <strong>USD Pending ($)</strong> (Col. V) por días de <strong>Aging</strong> (Col. C)</div>
+        <div class="chart-desc">Suma de <strong>USD Pending ($)</strong> (Col. X) por días de <strong>Aging</strong> (Col. C)</div>
       </div>
       <div class="canvas-wrap-bar"><canvas id="chartAging"></canvas></div>
     </div>
@@ -571,14 +678,14 @@
     </div>
   </section>
 
-  <!-- BLOQUE 3: TABLA SEGUIMIENTO RELEVANTE (COLUMNAS ALINEADAS) -->
+  <!-- BLOQUE 3: TABLA SEGUIMIENTO RELEVANTE CON ENLACES DIRECTOS A WMS -->
   <section class="card-full">
     <div class="chart-header">
       <div class="chart-title-row">
         <h3 class="chart-title">Seguimiento relevante (Top 25 Issues con mayor impacto pendiente)</h3>
-        <span class="tag" style="color:#FFE600;">Clic en Ubicación para ver detalle del Tote</span>
+        <span class="tag" style="color:#FFE600;">Clic en SKU / Ubicación abre WMS • Clic en otra columna abre detalle</span>
       </div>
-      <div class="chart-desc">Ordenado de mayor a menor <strong>USD Pending ($)</strong> • Columnas alineadas exactamente a la hoja Seguimiento</div>
+      <div class="chart-desc">Ordenado de mayor a menor <strong>USD Pending ($)</strong> • Enlaces directos a reportes de WMS AdminML</div>
     </div>
     <div class="table-wrapper">
       <table>
@@ -586,9 +693,9 @@
           <tr>
             <th>Aging</th>
             <th>Issue</th>
-            <th>SKU</th>
+            <th>SKU (WMS)</th>
             <th>Título</th>
-            <th>Ubicación</th>
+            <th>Ubicación (MU Transfer)</th>
             <th class="num-right">Qty pending</th>
             <th class="num-right">USD Pending</th>
             <th>HV</th>
@@ -610,7 +717,7 @@
           <h3 class="chart-title">Impacto USD por semana</h3>
           <span class="tag">USD Inicial ($)</span>
         </div>
-        <div class="chart-desc">Suma de <strong>USD Inicial ($)</strong> (Col. P) por <strong>Semana Lost</strong> (Col. A)</div>
+        <div class="chart-desc">Suma de <strong>USD Inicial ($)</strong> (Col. Q) por <strong>Semana Lost</strong> (Col. A)</div>
       </div>
       <div class="canvas-wrap-bar"><canvas id="chartImpactoSemana"></canvas></div>
     </div>
@@ -621,20 +728,20 @@
           <h3 class="chart-title">MU's Losteados por semana</h3>
           <span class="tag">Conteo de MUs</span>
         </div>
-        <div class="chart-desc">Conteo de <strong>Ubicaciones únicas</strong> (Col. I) por <strong>Semana Lost</strong> (Col. A)</div>
+        <div class="chart-desc">Conteo de <strong>Ubicaciones únicas</strong> (Col. K) por <strong>Semana Lost</strong> (Col. A)</div>
       </div>
       <div class="canvas-wrap-bar"><canvas id="chartMusSemana"></canvas></div>
     </div>
   </section>
 
-  <!-- BLOQUE 5: DETALLE AGING EN USD PENDING ($) -->
+  <!-- BLOQUE 5: DETALLE AGING -->
   <section class="card-full">
     <div class="chart-header">
       <div class="chart-title-row">
         <h3 class="chart-title">Detalle Aging por Tipo de Análisis</h3>
         <span class="tag">USD Pending ($)</span>
       </div>
-      <div class="chart-desc">Suma de <strong>USD Pending ($)</strong> (Col. V) por días de <strong>Aging</strong> (Col. C) apilado por <strong>Análisis</strong> (Col. AU)</div>
+      <div class="chart-desc">Suma de <strong>USD Pending ($)</strong> (Col. X) por días de <strong>Aging</strong> (Col. C) apilado por <strong>Análisis</strong> (Col. AU)</div>
     </div>
     <div class="canvas-wrap-bar" style="height:270px;"><canvas id="chartDetalleAging"></canvas></div>
   </section>
@@ -690,15 +797,17 @@
 
 </main>
 
-<!-- MODAL DETALLE DE TOTE -->
-<div id="modal-tote" class="modal-backdrop" onclick="cerrarModalSiFondo(event)">
+<!-- =========================================================
+     MODAL 1: DETALLE DE TOTE (CON ENLACES INBOUND E INCONSISTENCIAS)
+     ========================================================= -->
+<div id="modal-tote" class="modal-backdrop" onclick="cerrarModalSiFondo(event, 'modal-tote')">
   <div class="modal-card">
     <div class="modal-header">
       <div>
         <h2 id="modal-tote-titulo">Detalle de Ubicación: ---</h2>
-        <p id="modal-tote-subtitulo">Desglose completo de registros asociados al contenedor</p>
+        <p id="modal-tote-subtitulo">Clic en Inbound o Status (Pendiente) para abrir directamente en WMS AdminML</p>
       </div>
-      <button class="btn-close-modal" onclick="cerrarModal()">✕ Cerrar</button>
+      <button class="btn-close-modal" onclick="cerrarModal('modal-tote')">✕ Cerrar</button>
     </div>
     <div class="modal-summary-strip">
       <div class="m-stat"><span>Total Issues / Líneas</span><strong id="m-total-lineas">0</strong></div>
@@ -714,14 +823,14 @@
               <th>Semana</th>
               <th>Aging</th>
               <th>Issue</th>
-              <th>Inbound</th>
-              <th>SKU</th>
+              <th>Inbound (WMS)</th>
+              <th>SKU (WMS)</th>
               <th>Título</th>
               <th class="num-right">Qty Ini</th>
               <th class="num-right">Qty Pend</th>
               <th class="num-right">USD Pend</th>
               <th>Fecha Pago</th>
-              <th>Status</th>
+              <th>Status (Inconsistencias)</th>
               <th>Análisis</th>
               <th>Comentarios</th>
             </tr>
@@ -733,13 +842,44 @@
   </div>
 </div>
 
+<!-- =========================================================
+     MODAL 2: BORRADOR DE REPORTE CORPORATIVO PARA CORREO
+     ========================================================= -->
+<div id="modal-reporte" class="modal-backdrop" onclick="cerrarModalSiFondo(event, 'modal-reporte')">
+  <div class="modal-card" style="max-width: 900px;">
+    <div class="modal-header">
+      <div>
+        <h2>✉️ Borrador de Reporte Ejecutivo — Loss Prevention MXRC03</h2>
+        <p>Generado automáticamente con los datos y filtros activos del tablero</p>
+      </div>
+      <button class="btn-close-modal" onclick="cerrarModal('modal-reporte')">✕ Cerrar</button>
+    </div>
+
+    <div class="email-actions-bar">
+      <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <button type="button" class="btn-copy-rich" id="btn-copiar-correo" onclick="copiarReporteCorreo()">
+          📋 Copiar reporte con formato (Para pegar en Gmail)
+        </button>
+        <a id="link-abrir-gmail" href="#" target="_blank" class="btn-open-gmail">
+          🚀 Abrir redacción en Gmail
+        </a>
+      </div>
+      <span style="font-size:11.5px; color:#94A3B8;">Tip: Pega con <strong>Ctrl + V</strong> en Gmail para conservar negritas y viñetas</span>
+    </div>
+
+    <div class="modal-body" style="background:#0F172A;">
+      <div id="email-html-render" class="email-preview-container"></div>
+    </div>
+  </div>
+</div>
+
 <script>
 const DASHBOARD_API_URL = "https://pending-lost-api.abraham-velazquezvelazquez.workers.dev";
 
 const CONFIG_FILTROS = [
   { campo: "semanaLost",        etiqueta: "Semana Lost (Col. A)" },
-  { campo: "hv",                etiqueta: "Categoría HV (Col. L)" },
-  { campo: "rango",             etiqueta: "Rango USD (Col. U)" },
+  { campo: "hv",                etiqueta: "Categoría HV (Col. N)" },
+  { campo: "rango",             etiqueta: "Rango USD (Col. V)" },
   { campo: "analisis",          etiqueta: "Análisis (Col. AU)" },
   { campo: "semanaPago",        etiqueta: "Semana Pago (Col. AB)" },
   { campo: "semanaSeguimiento", etiqueta: "Sem. Seguimiento (Col. AQ)" },
@@ -770,8 +910,26 @@ Chart.defaults.borderColor = "rgba(255,255,255,0.06)";
 Chart.defaults.font.family = "'Inter', sans-serif";
 Chart.defaults.font.size = 11;
 
-// Formateador de moneda USD para tooltips de todas las gráficas
 const fmtUSD = (val) => "$" + Number(val || 0).toLocaleString("es-MX", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " USD";
+
+/* =========================================================================
+   GENERADORES DE ENLACES DINÁMICOS A WMS ADMINML
+   ========================================================================= */
+function urlWmsSku(sku) {
+  return `https://wms.adminml.com/reports/skus/${encodeURIComponent(sku)}`;
+}
+
+function urlWmsMuTransfer(sku, ubicacion) {
+  return `https://wms.adminml.com/reports/mu-in-transfer?last_updated_from=2026-01-01&last_updated_to=2026-12-31&inventory_id=${encodeURIComponent(sku)}&transfer_unit_container_id=${encodeURIComponent(ubicacion)}`;
+}
+
+function urlWmsInbound(inbound) {
+  return `https://wms.adminml.com/reports/inbound-shipment/${encodeURIComponent(inbound)}`;
+}
+
+function urlWmsInconsistencies(sku, ubicacion) {
+  return `https://wms.adminml.com/reports/inconsistencies?inventory_id=${encodeURIComponent(sku)}&site_id=MLM&date_to=2027-01-01T05%3A59%3A00.000%2B00%3A00&date_from=2026-01-01T06%3A00%3A00.000%2B00%3A00&sort=date_last_updated_desc&address_id=${encodeURIComponent(ubicacion)}`;
+}
 
 window.addEventListener("DOMContentLoaded", () => {
   construirContenedoresMultifiltro();
@@ -954,6 +1112,12 @@ function fmtCompacto(num, esMoneda = false) {
   return pref + num.toLocaleString("es-MX", { maximumFractionDigits: esMoneda ? 2 : 0 });
 }
 
+function fmtCorreoUSD(num) {
+  if (Math.abs(num) >= 1_000_000) return "$" + (num / 1_000_000).toFixed(1) + "M USD";
+  if (Math.abs(num) >= 1_000) return "$" + (num / 1_000).toFixed(1) + "K USD";
+  return "$" + Math.round(num).toLocaleString("es-MX") + " USD";
+}
+
 function actualizarKPIs() {
   let pzsLost = 0, usdLost = 0, pzsPend = 0, usdPend = 0, pzsSeg = 0, usdSeg = 0;
 
@@ -978,7 +1142,7 @@ function actualizarKPIs() {
 }
 
 /* =========================================================================
-   GRÁFICAS (TODAS EN USD PENDING $)
+   GRÁFICAS (EN USD PENDING $)
    ========================================================================= */
 function agruparSuma(lista, keyFn, valFn) {
   const map = {};
@@ -1076,29 +1240,23 @@ function crearBarrasInteractivas(canvasId, etiquetas, datasets, campoFiltroX, ap
 function renderizarTodasLasGraficas() {
   const soloConPending = registrosFiltrados.filter(r => r.usdPending > 0);
 
-  // 1. Análisis -> Total USD Pending ($) por tipo de Análisis (Col. AU)
   const g1 = agruparSuma(soloConPending, r => r.analisisNorm, r => r.usdPending);
   crearDonaUSD("chartAnalisis", g1.map(d => d[0]), g1.map(d => d[1]), "analisis");
 
-  // 2. Rango USD -> Total USD Pending ($) según Rango (Col. U)
   const g2 = agruparSuma(soloConPending, r => r.rango || "Sin rango", r => r.usdPending);
   crearDonaUSD("chartRango", g2.map(d => d[0]), g2.map(d => d[1]), "rango");
 
-  // 3. Categoría (HV) -> Total USD Pending ($) únicamente donde Col. L (HV) contiene dato
   const soloConHV = soloConPending.filter(r => r.hv !== "" && r.hv !== "-");
   const g3 = agruparSuma(soloConHV, r => r.hv, r => r.usdPending);
   crearDonaUSD("chartHV", g3.map(d => d[0]), g3.map(d => d[1]), "hv", ["#3B82F6", "#F59E0B", "#10B981"]);
 
-  // 4. Próximo a pago -> Total USD Pending ($) por Análisis solo donde Col. Z (Fecha de pago) tenga fecha
   const conFechaPago = soloConPending.filter(r => r.fechaPago !== "");
   const g4 = agruparSuma(conFechaPago, r => r.analisisNorm, r => r.usdPending);
   crearDonaUSD("chartProximoPago", g4.map(d => d[0]), g4.map(d => d[1]), "analisis");
 
-  // 5. Seguimiento total -> Total USD Pending ($) por Seguimiento vs Sin Seguimiento (Col. AP)
   const g5 = agruparSuma(soloConPending, r => r.seguimiento || "SIN SEGUIMIENTO", r => r.usdPending);
   crearDonaUSD("chartSeguimientoTotal", g5.map(d => d[0]), g5.map(d => d[1]), "seguimiento", ["#F59E0B", "#3B82F6", "#64748B"]);
 
-  // 6. Aging -> Total USD Pending ($) por días de Aging (Col. C)
   const mapAging = {};
   for (const r of soloConPending) {
     if (r.agingStr !== "") mapAging[r.agingStr] = (mapAging[r.agingStr] || 0) + r.usdPending;
@@ -1113,7 +1271,6 @@ function renderizarTodasLasGraficas() {
     true
   );
 
-  // 7. Próximas a pago por Semana Pago -> Total USD Pending ($) por Semana Pago (Col. AB) y Análisis
   const conSemanaPago = soloConPending.filter(r => r.semanaPago !== "");
   const semanasPago = [...new Set(conSemanaPago.map(r => r.semanaPago))].sort();
   const tiposAnalisisPago = [...new Set(conSemanaPago.map(r => r.analisisNorm))];
@@ -1127,7 +1284,6 @@ function renderizarTodasLasGraficas() {
   }));
   crearBarrasInteractivas("chartProximasSemana", semanasPago, ds7, "semanaPago", true, true);
 
-  // 8 y 9. Impacto USD por semana y MU's Losteados por semana
   const mapSemUsd = {};
   const mapSemMus = {};
   for (const r of registrosFiltrados) {
@@ -1156,7 +1312,6 @@ function renderizarTodasLasGraficas() {
     false
   );
 
-  // 10. Detalle Aging -> Total USD Pending ($) por Aging apilado por Análisis
   const agingsUnicos = g6.map(d => d[0]);
   const analisisTodos = [...new Set(soloConPending.map(r => r.analisisNorm))];
   const ds10 = analisisTodos.map((an, idx) => ({
@@ -1171,7 +1326,7 @@ function renderizarTodasLasGraficas() {
 }
 
 /* =========================================================================
-   TABLAS EJECUTIVAS (COLUMNAS CORREGIDAS)
+   TABLAS CON ENLACES DIRECTOS A WMS Y DETALLE DE TOTE
    ========================================================================= */
 function renderizarTablas() {
   const topRelevante = [...registrosFiltrados]
@@ -1182,13 +1337,16 @@ function renderizarTablas() {
   const maxUsdRel = topRelevante.length > 0 ? topRelevante[0].usdPending : 1;
   document.getElementById("tbody-relevante").innerHTML = topRelevante.map(r => {
     const alpha = Math.max(0.12, (r.usdPending / maxUsdRel) * 0.65).toFixed(2);
+    const linkSku = r.sku ? `<a href="${urlWmsSku(r.sku)}" target="_blank" rel="noopener" class="wms-link-sku" onclick="event.stopPropagation()" title="Ver SKU en WMS">${r.sku}</a>` : "—";
+    const linkUbi = r.ubicacion ? `<a href="${urlWmsMuTransfer(r.sku, r.ubicacion)}" target="_blank" rel="noopener" class="wms-link" onclick="event.stopPropagation()" title="Ver MU in Transfer en WMS">${r.ubicacion}</a>` : "—";
+
     return `
       <tr class="clickable-tote" onclick="abrirDetalleTote('${r.ubicacion.replace(/'/g, "\\'")}')">
         <td><strong>${r.agingRaw}</strong></td>
         <td>${r.issue}</td>
-        <td>${r.sku}</td>
+        <td>${linkSku}</td>
         <td style="max-width:250px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${r.titulo}">${r.titulo}</td>
-        <td><span class="tote-link">${r.ubicacion}</span></td>
+        <td>${linkUbi}</td>
         <td class="num-right">${r.qtyPending.toLocaleString("es-MX")}</td>
         <td class="num-right" style="background:rgba(239, 68, 68, ${alpha});">$${r.usdPending.toLocaleString("es-MX", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
         <td>${r.hv || "—"}</td>
@@ -1246,6 +1404,9 @@ function renderizarTablas() {
   }).join("");
 }
 
+/* =========================================================================
+   MODAL DETALLE DE TOTE (CON LINKS A INBOUND E INCONSISTENCIAS)
+   ========================================================================= */
 function abrirDetalleTote(ubicacion) {
   if (!ubicacion) return;
   const items = registrosFiltrados.filter(r => r.ubicacion === ubicacion);
@@ -1258,35 +1419,217 @@ function abrirDetalleTote(ubicacion) {
   }
 
   document.getElementById("modal-tote-titulo").textContent = `Detalle de Ubicación (Tote): ${ubicacion}`;
-  document.getElementById("modal-tote-subtitulo").textContent = `Mostrando ${items.length} registro(s) filtrados en la hoja Seguimiento`;
+  document.getElementById("modal-tote-subtitulo").textContent = `Mostrando ${items.length} registro(s) • Clic en Inbound o Status para abrir WMS`;
   document.getElementById("m-total-lineas").textContent = items.length;
   document.getElementById("m-qty-ini").textContent = sumIni.toLocaleString("es-MX");
   document.getElementById("m-qty-pend").textContent = sumPend.toLocaleString("es-MX");
   document.getElementById("m-usd-pend").textContent = "$" + sumUsd.toLocaleString("es-MX", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-  document.getElementById("tbody-modal-detalle").innerHTML = items.map(it => `
-    <tr>
-      <td>${it.semanaLost}</td>
-      <td><strong>${it.agingRaw}</strong></td>
-      <td>${it.issue}</td>
-      <td>${it.inbound}</td>
-      <td>${it.sku}</td>
-      <td>${it.titulo}</td>
-      <td class="num-right">${it.qtyInicial.toLocaleString("es-MX")}</td>
-      <td class="num-right">${it.qtyPending.toLocaleString("es-MX")}</td>
-      <td class="num-right" style="color:#FFE600;">$${it.usdPending.toLocaleString("es-MX", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-      <td>${it.fechaPago || "—"}</td>
-      <td><span class="badge-status">${it.status || "—"}</span></td>
-      <td>${it.analisisNorm}</td>
-      <td>${it.comentarios || "—"}</td>
-    </tr>
-  `).join("");
+  document.getElementById("tbody-modal-detalle").innerHTML = items.map(it => {
+    const linkInbound = it.inbound
+      ? `<a href="${urlWmsInbound(it.inbound)}" target="_blank" rel="noopener" class="wms-link" title="Abrir Inbound Shipment en WMS">${it.inbound}</a>`
+      : "—";
+    const linkSku = it.sku
+      ? `<a href="${urlWmsSku(it.sku)}" target="_blank" rel="noopener" class="wms-link-sku" title="Abrir SKU en WMS">${it.sku}</a>`
+      : "—";
+    const linkStatus = it.status
+      ? `<a href="${urlWmsInconsistencies(it.sku, it.ubicacion)}" target="_blank" rel="noopener" class="badge-status-link" title="Abrir Inconsistencias en WMS">${it.status}</a>`
+      : "—";
+
+    return `
+      <tr>
+        <td>${it.semanaLost}</td>
+        <td><strong>${it.agingRaw}</strong></td>
+        <td>${it.issue}</td>
+        <td>${linkInbound}</td>
+        <td>${linkSku}</td>
+        <td>${it.titulo}</td>
+        <td class="num-right">${it.qtyInicial.toLocaleString("es-MX")}</td>
+        <td class="num-right">${it.qtyPending.toLocaleString("es-MX")}</td>
+        <td class="num-right" style="color:#FFE600;">$${it.usdPending.toLocaleString("es-MX", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+        <td>${it.fechaPago || "—"}</td>
+        <td>${linkStatus}</td>
+        <td>${it.analisisNorm}</td>
+        <td>${it.comentarios || "—"}</td>
+      </tr>
+    `;
+  }).join("");
 
   document.getElementById("modal-tote").style.display = "flex";
 }
 
-function cerrarModal() { document.getElementById("modal-tote").style.display = "none"; }
-function cerrarModalSiFondo(e) { if (e.target.id === "modal-tote") cerrarModal(); }
+/* =========================================================================
+   GENERADOR DE BORRADOR DE CORREO CORPORATIVO (ESTILO REFERENCIA)
+   ========================================================================= */
+function obtenerEmojiAnalisis(nombre) {
+  const n = nombre.toUpperCase();
+  if (n.includes("LOCALIZADO")) return "🔍";
+  if (n.includes("CCM")) return "🚨";
+  if (n.includes("INFLACIÓN") || n.includes("INFLACION")) return "❗";
+  if (n.includes("CRUCE")) return "🔀";
+  if (n.includes("SOLICITUD") || n.includes("CG")) return "🌐";
+  if (n.includes("DESTINO")) return "🚚";
+  if (n.includes("FIFO")) return "⏳";
+  return "📌";
+}
+
+function abrirModalReporte() {
+  const pendientes = registrosFiltrados.filter(r => r.usdPending > 0);
+  const totalUsdPend = pendientes.reduce((acc, r) => acc + r.usdPending, 0);
+
+  // 1. Piezas de Alto Valor (HV === "HV")
+  const itemsHV = pendientes.filter(r => r.hv.toUpperCase() === "HV");
+  const usdHV = itemsHV.reduce((acc, r) => acc + r.usdPending, 0);
+  const usdHVSeg = itemsHV.filter(r => r.seguimiento.toUpperCase() === "SEGUIMIENTO").reduce((acc, r) => acc + r.usdPending, 0);
+  const pctHVSeg = usdHV > 0 ? ((usdHVSeg / usdHV) * 100).toFixed(1) : "0.0";
+  const desgloseHV = agruparSuma(itemsHV, r => r.analisisNorm, r => r.usdPending);
+
+  // 2. Piezas > $100 USD (Rango === ">100 USD" o usdPending > 100)
+  const itemsMayor100 = pendientes.filter(r => r.rango.includes(">100") || r.usdPending > 100);
+  const usdMayor100 = itemsMayor100.reduce((acc, r) => acc + r.usdPending, 0);
+  const usdMayor100Seg = itemsMayor100.filter(r => r.seguimiento.toUpperCase() === "SEGUIMIENTO").reduce((acc, r) => acc + r.usdPending, 0);
+  const pctMayor100Seg = usdMayor100 > 0 ? ((usdMayor100Seg / usdMayor100) * 100).toFixed(1) : "0.0";
+  const desgloseMayor100 = agruparSuma(itemsMayor100, r => r.analisisNorm, r => r.usdPending);
+
+  // 3. Top 5 Agings con mayor impacto pendiente
+  const mapAging = {};
+  for (const r of pendientes) {
+    if (r.agingStr !== "") mapAging[r.agingStr] = (mapAging[r.agingStr] || 0) + r.usdPending;
+  }
+  const topAgings = Object.entries(mapAging).sort((a, b) => b[1] - a[1]).slice(0, 6);
+
+  // 4. Desglose general de todos los análisis pendientes
+  const desgloseGeneral = agruparSuma(pendientes, r => r.analisisNorm, r => r.usdPending);
+
+  // Periodos activos para el asunto del correo
+  const periodosActivos = estadoFiltros.semanaLost.size > 0
+    ? [...estadoFiltros.semanaLost].join(", ")
+    : "Acumulado General";
+
+  const htmlCorreo = `
+    <p style="margin:0 0 14px 0;">¡Buen día, equipo!</p>
+    <p style="margin:0 0 18px 0;">
+      Les comparto el análisis detallado actualizado sobre la generación de <strong>LOST</strong> en MXRC03 (${periodosActivos}), el cual asciende a un <strong>monto total pendiente de ${fmtCorreoUSD(totalUsdPend)}</strong>.
+    </p>
+
+    <p style="margin:0 0 12px 0; font-weight:bold; color:#0F172A;">Clasificaciones</p>
+
+    <div style="margin-bottom:18px;">
+      <div style="font-size:15px; font-weight:bold; color:#0F172A; margin-bottom:4px;">
+        🚚 1. Piezas de Alto Valor (HV)
+      </div>
+      <div style="font-style:italic; margin-bottom:8px; color:#334155;">
+        Monto acumulado en esta categoría: <strong>${fmtCorreoUSD(usdHV)}</strong> (<u>${pctHVSeg}% en seguimiento</u>)
+      </div>
+      <ul style="margin:0; padding-left:22px;">
+        ${desgloseHV.length > 0
+          ? desgloseHV.map(([an, val]) => `<li style="margin-bottom:4px;"><strong>${an}:</strong> <em>${fmtCorreoUSD(val)}</em> ${obtenerEmojiAnalisis(an)}</li>`).join("")
+          : `<li>Sin monto pendiente en esta categoría.</li>`}
+      </ul>
+    </div>
+
+    <div style="margin-bottom:18px;">
+      <div style="font-size:15px; font-weight:bold; color:#0F172A; margin-bottom:4px;">
+        💰 2. Piezas &gt; $100 USD
+      </div>
+      <div style="font-style:italic; margin-bottom:8px; color:#334155;">
+        Monto acumulado en esta categoría: <strong>${fmtCorreoUSD(usdMayor100)}</strong> (<u>${pctMayor100Seg}% en seguimiento</u>)
+      </div>
+      <ul style="margin:0; padding-left:22px;">
+        ${desgloseMayor100.length > 0
+          ? desgloseMayor100.map(([an, val]) => `<li style="margin-bottom:4px;"><strong>${an}:</strong> <em>${fmtCorreoUSD(val)}</em> ${obtenerEmojiAnalisis(an)}</li>`).join("")
+          : `<li>Sin monto pendiente en esta categoría.</li>`}
+      </ul>
+    </div>
+
+    <div style="margin-bottom:18px;">
+      <div style="font-size:15px; font-weight:bold; color:#0F172A; margin-bottom:6px;">
+        📈 3. Detalle agings con mayor impacto pendiente
+      </div>
+      <ul style="margin:0; padding-left:22px;">
+        ${topAgings.map(([ag, val]) => `<li style="margin-bottom:4px;"><strong>Aging ${ag} días:</strong> <em>${fmtCorreoUSD(val)}</em></li>`).join("")}
+      </ul>
+    </div>
+
+    <div style="margin-bottom:14px;">
+      <div style="font-size:15px; font-weight:bold; color:#0F172A; margin-bottom:6px;">
+        📊 4. Resumen consolidado por estatus de Análisis
+      </div>
+      <table style="border-collapse:collapse; width:100%; max-width:520px; font-size:12.5px; border:1px solid #CBD5E1;">
+        <thead>
+          <tr style="background:#1B365D; color:#FFFFFF;">
+            <th style="padding:7px 10px; text-align:left; border:1px solid #CBD5E1;">Tipo de Análisis</th>
+            <th style="padding:7px 10px; text-align:right; border:1px solid #CBD5E1;">USD Pending</th>
+            <th style="padding:7px 10px; text-align:right; border:1px solid #CBD5E1;">% Participación</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${desgloseGeneral.map(([an, val]) => {
+            const pct = totalUsdPend > 0 ? ((val / totalUsdPend) * 100).toFixed(1) : "0.0";
+            return `
+              <tr>
+                <td style="padding:6px 10px; border:1px solid #CBD5E1;">${an}</td>
+                <td style="padding:6px 10px; text-align:right; border:1px solid #CBD5E1; font-weight:bold;">${fmtUSD(val)}</td>
+                <td style="padding:6px 10px; text-align:right; border:1px solid #CBD5E1;">${pct}%</td>
+              </tr>
+            `;
+          }).join("")}
+        </tbody>
+      </table>
+    </div>
+
+    <p style="margin:16px 0 0 0; color:#475569; font-size:12.5px;">
+      Quedo atento a cualquier duda o comentario.<br>
+      <strong>Saludos cordiales • Loss Prevention MXRC03</strong>
+    </p>
+  `;
+
+  document.getElementById("email-html-render").innerHTML = htmlCorreo;
+
+  // Configurar enlace directo a Gmail con asunto y cuerpo en texto plano como respaldo
+  const asunto = encodeURIComponent(`Seguimiento Pending Lost MWH - MXRC03 (${periodosActivos})`);
+  const textoPlano = document.getElementById("email-html-render").innerText;
+  const cuerpo = encodeURIComponent(textoPlano);
+  document.getElementById("link-abrir-gmail").href = `https://mail.google.com/mail/?view=cm&fs=1&su=${asunto}&body=${cuerpo}`;
+
+  document.getElementById("modal-reporte").style.display = "flex";
+}
+
+async function copiarReporteCorreo() {
+  const contenedor = document.getElementById("email-html-render");
+  const btn = document.getElementById("btn-copiar-correo");
+
+  try {
+    // Copia tanto en formato HTML enriquecido (negritas, tablas, viñetas) como texto plano
+    const htmlBlob = new Blob([contenedor.innerHTML], { type: "text/html" });
+    const textBlob = new Blob([contenedor.innerText], { type: "text/plain" });
+    const clipboardItem = new ClipboardItem({ "text/html": htmlBlob, "text/plain": textBlob });
+    await navigator.clipboard.write([clipboardItem]);
+
+    btn.textContent = "✅ ¡Copiado! Listo para pegar en Gmail (Ctrl + V)";
+    btn.style.background = "#10B981";
+    setTimeout(() => {
+      btn.textContent = "📋 Copiar reporte con formato (Para pegar en Gmail)";
+    }, 3500);
+  } catch (err) {
+    // Respaldo de selección directa si el navegador restringe ClipboardItem
+    const range = document.createRange();
+    range.selectNode(contenedor);
+    window.getSelection().removeAllRanges();
+    window.getSelection().addRange(range);
+    document.execCommand("copy");
+    window.getSelection().removeAllRanges();
+    btn.textContent = "✅ ¡Copiado al portapapeles!";
+  }
+}
+
+function cerrarModal(idModal) {
+  document.getElementById(idModal).style.display = "none";
+}
+
+function cerrarModalSiFondo(e, idModal) {
+  if (e.target.id === idModal) cerrarModal(idModal);
+}
 </script>
 </body>
 </html>
