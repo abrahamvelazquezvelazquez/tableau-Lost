@@ -1,147 +1,1292 @@
-export default {
-  async fetch(request, env) {
-    const corsHeaders = {
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type"
-    };
-
-    if (request.method === "OPTIONS") {
-      return new Response(null, { headers: corsHeaders });
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pending Lost MWH - MXRC03 | Loss Prevention</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --bg-body: #0B1120;
+      --bg-card: #131C31;
+      --bg-card-alt: #1A253C;
+      --border-color: #26344F;
+      --text-primary: #F8FAFC;
+      --text-secondary: #94A3B8;
+      --accent-blue: #3B82F6;
+      --accent-yellow: #FFE600;
+      --accent-emerald: #10B981;
+      --accent-red: #EF4444;
+      --accent-amber: #F59E0B;
     }
 
-    try {
-      let clientEmail = env.GOOGLE_CLIENT_EMAIL;
-      let privateKey = env.GOOGLE_PRIVATE_KEY;
+    * { box-sizing: border-box; font-family: 'Inter', system-ui, sans-serif; }
 
-      if (!clientEmail || !privateKey) {
-        if (!env.GOOGLE_SERVICE_ACCOUNT) {
-          throw new Error("Falta configurar GOOGLE_CLIENT_EMAIL y GOOGLE_PRIVATE_KEY en Cloudflare.");
-        }
-        const sa = JSON.parse(env.GOOGLE_SERVICE_ACCOUNT);
-        clientEmail = sa.client_email;
-        privateKey = sa.private_key;
-      }
-
-      const token = await getGoogleToken(clientEmail, privateKey);
-
-      const sheetId = "1tLAyayZkAWJ0XtyQWWILutdQ_8sr7rjf1VsXxcAuL4M";
-      const range = encodeURIComponent("Seguimiento!A:AV");
-      const resRead = await fetch(
-        `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      const dataRead = await resRead.json();
-
-      if (dataRead.error) {
-        throw new Error("Google Sheets API: " + dataRead.error.message);
-      }
-
-      const rows = dataRead.values || [];
-      if (rows.length <= 1) {
-        return new Response(JSON.stringify({ registros: [] }), {
-          headers: { ...corsHeaders, "Content-Type": "application/json" }
-        });
-      }
-
-      const parseNum = (val) => {
-        if (!val) return 0;
-        const clean = String(val).replace(/[$,\s]/g, "");
-        const n = parseFloat(clean);
-        return isNaN(n) ? 0 : n;
-      };
-
-      const registros = [];
-      for (let i = 1; i < rows.length; i++) {
-        const r = rows[i];
-        if (!r[0] && !r[3] && !r[8]) continue;
-
-        registros.push({
-          semanaLost: (r[0] || "").trim(),             // Col A (0): Semana Lost
-          fechaIS: (r[1] || "").trim(),                // Col B (1): Fecha de IS
-          aging: parseNum(r[2]),                       // Col C (2): Aging
-          agingRaw: (r[2] || "").trim(),
-          issue: (r[3] || "").trim(),                  // Col D (3): Issue
-          inbound: (r[4] || "").trim(),                // Col E (4): Inbound
-          sku: (r[6] || "").trim(),                    // Col G (6): SKU
-          titulo: (r[7] || "").trim(),                 // Col H (7): Título
-          ubicacion: (r[8] || "").trim(),              // Col I (8): Ubicación
-          qtyInicial: parseNum(r[9]),                  // Col J (9): Qty inicial
-          categoria: (r[10] || "").trim(),             // Col K (10): Categoría
-          hv: (r[11] || "").trim(),                    // Col L (11): HV
-          usdInicial: parseNum(r[15]),                 // Col P (15): USD Inicial
-          rango: (r[20] || "").trim(),                 // Col U (20): Rango
-          usdPending: parseNum(r[21]),                 // Col V (21): USD Pending
-          qtyPending: parseNum(r[23]),                 // Col X (23): Qty pending
-          status: (r[24] || "").trim(),                // Col Y (24): Status
-          fechaPago: (r[25] || "").trim(),             // Col Z (25): Fecha de pago
-          semanaPago: (r[27] || "").trim(),            // Col AB (27): Semana Pago
-          piezasIndebidas: parseNum(r[33]),            // Col AH (33): Piezas con ticket indebidas
-          seguimiento: (r[41] || "").trim(),           // Col AP (41): Seguimiento
-          semanaSeguimiento: (r[42] || "").trim(),     // Col AQ (42): Semana Seguimiento
-          comentarios: (r[45] || "").trim(),           // Col AT (45): Comentarios
-          analisis: (r[46] || "").trim()               // Col AU (46): Análisis
-        });
-      }
-
-      return new Response(JSON.stringify({
-        actualizado: new Date().toISOString(),
-        totalFilas: registros.length,
-        registros
-      }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" }
-      });
-
-    } catch (err) {
-      return new Response(JSON.stringify({ error: err.message }), {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" }
-      });
+    body {
+      margin: 0;
+      background-color: var(--bg-body);
+      color: var(--text-primary);
+      padding-bottom: 40px;
     }
-  }
+
+    .topbar {
+      background: linear-gradient(90deg, #0F172A 0%, #1E293B 100%);
+      border-bottom: 1px solid var(--border-color);
+      border-top: 4px solid var(--accent-yellow);
+      padding: 16px 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.45);
+    }
+
+    .brand-title { display: flex; align-items: center; gap: 12px; }
+
+    .brand-badge {
+      background: var(--accent-yellow);
+      color: #0F172A;
+      font-weight: 800;
+      font-size: 11px;
+      padding: 5px 10px;
+      border-radius: 6px;
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+    }
+
+    .brand-title h1 { margin: 0; font-size: 20px; font-weight: 800; color: #FFFFFF; }
+    .brand-sub { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+
+    .topbar-controls { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+    .btn-refresh {
+      background: var(--accent-blue);
+      color: #FFFFFF;
+      border: none;
+      padding: 9px 14px;
+      border-radius: 8px;
+      font-size: 12.5px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.2s;
+    }
+    .btn-refresh:hover { background: #2563EB; }
+
+    .btn-clear {
+      background: var(--bg-card-alt);
+      color: #E2E8F0;
+      border: 1px solid var(--border-color);
+      padding: 9px 14px;
+      border-radius: 8px;
+      font-size: 12.5px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .btn-clear:hover { background: #EF4444; border-color: #EF4444; color: #FFFFFF; }
+
+    .container {
+      max-width: 1480px;
+      margin: 0 auto;
+      padding: 20px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .filters-bar {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 16px 20px;
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 12px;
+    }
+
+    .filter-item { position: relative; }
+    .filter-item label {
+      display: block;
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 5px;
+    }
+
+    .multi-btn {
+      width: 100%;
+      background: var(--bg-body);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 8px 10px;
+      font-size: 12px;
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+    .multi-btn.has-selection {
+      border-color: var(--accent-yellow);
+      background: rgba(255, 230, 0, 0.08);
+      color: var(--accent-yellow);
+      font-weight: 700;
+    }
+
+    .multi-menu {
+      display: none;
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0;
+      min-width: 220px;
+      max-height: 260px;
+      overflow-y: auto;
+      background: #0F172A;
+      border: 1px solid var(--accent-blue);
+      border-radius: 8px;
+      padding: 8px;
+      z-index: 80;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.65);
+    }
+    .multi-menu.open { display: block; }
+
+    .multi-option {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 8px;
+      border-radius: 5px;
+      font-size: 12px;
+      color: #E2E8F0;
+      cursor: pointer;
+    }
+    .multi-option:hover { background: rgba(59, 130, 246, 0.2); }
+    .multi-option input { accent-color: var(--accent-yellow); cursor: pointer; }
+
+    .active-pills-bar {
+      display: none;
+      background: rgba(59, 130, 246, 0.1);
+      border: 1px solid rgba(59, 130, 246, 0.35);
+      border-radius: 10px;
+      padding: 10px 16px;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .pills-title { font-size: 11px; font-weight: 800; color: #93C5FD; text-transform: uppercase; margin-right: 4px; }
+    .filter-pill {
+      background: var(--bg-card);
+      border: 1px solid var(--accent-yellow);
+      color: #FFFFFF;
+      font-size: 11.5px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 20px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .filter-pill button {
+      background: none;
+      border: none;
+      color: var(--accent-yellow);
+      font-weight: 800;
+      cursor: pointer;
+      padding: 0;
+      font-size: 13px;
+    }
+
+    .top-analytics-grid {
+      display: grid;
+      grid-template-columns: 1.55fr 1fr;
+      gap: 20px;
+    }
+
+    .donuts-quad {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 18px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .mini-chart-box {
+      background: var(--bg-card-alt);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .chart-header { margin-bottom: 10px; }
+    .chart-title-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+    .chart-title { font-size: 13.5px; font-weight: 700; color: #F8FAFC; margin: 0; }
+    .chart-desc { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
+
+    .tag {
+      font-size: 10px;
+      font-weight: 700;
+      color: #93C5FD;
+      background: rgba(59, 130, 246, 0.15);
+      padding: 2px 7px;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+
+    .canvas-wrap-donut { position: relative; height: 175px; width: 100%; cursor: pointer; }
+    .canvas-wrap-bar { position: relative; height: 250px; width: 100%; cursor: pointer; }
+
+    .kpi-panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .kpi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    .kpi-card {
+      background: var(--bg-card-alt);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 14px 16px;
+      border-left: 4px solid var(--accent-blue);
+    }
+    .kpi-card.amber { border-left-color: var(--accent-amber); }
+    .kpi-card.emerald { border-left-color: var(--accent-emerald); }
+
+    .kpi-label { font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 5px; }
+    .kpi-value { font-size: 24px; font-weight: 800; color: #FFFFFF; }
+    .kpi-sub { font-size: 10.5px; color: var(--text-secondary); margin-top: 3px; }
+
+    .card-full {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 18px 20px;
+    }
+
+    .grid-2-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+    .table-wrapper {
+      overflow-x: auto;
+      max-height: 410px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+    }
+
+    table { width: 100%; border-collapse: collapse; font-size: 12px; }
+
+    thead th {
+      background: #1E293B;
+      color: #CBD5E1;
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 10.5px;
+      letter-spacing: 0.4px;
+      padding: 10px 10px;
+      text-align: left;
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      border-bottom: 1px solid var(--border-color);
+      white-space: nowrap;
+    }
+
+    tbody td {
+      padding: 9px 10px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      color: #E2E8F0;
+    }
+
+    tbody tr.clickable-tote { cursor: pointer; transition: background 0.15s; }
+    tbody tr.clickable-tote:hover { background: rgba(59, 130, 246, 0.18) !important; }
+
+    .tote-link { color: #60A5FA; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+    .num-right { text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; white-space: nowrap; }
+
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(2, 6, 23, 0.82);
+      backdrop-filter: blur(4px);
+      z-index: 100;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .modal-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-top: 4px solid var(--accent-yellow);
+      border-radius: 14px;
+      width: 100%;
+      max-width: 1180px;
+      max-height: 88vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 25px 50px rgba(0,0,0,0.6);
+    }
+
+    .modal-header {
+      padding: 16px 22px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .modal-header h2 { margin: 0; font-size: 17px; color: #FFFFFF; }
+    .modal-header p { margin: 3px 0 0; font-size: 12px; color: var(--text-secondary); }
+
+    .btn-close-modal {
+      background: #EF4444;
+      color: #FFFFFF;
+      border: none;
+      border-radius: 8px;
+      padding: 7px 13px;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 12px;
+    }
+
+    .modal-summary-strip {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      padding: 14px 22px;
+      background: var(--bg-card-alt);
+      border-bottom: 1px solid var(--border-color);
+    }
+    .m-stat span { display: block; font-size: 10.5px; color: var(--text-secondary); text-transform: uppercase; font-weight: 700; }
+    .m-stat strong { display: block; font-size: 16px; color: #FFFFFF; margin-top: 2px; }
+
+    .modal-body { padding: 16px 22px; overflow-y: auto; }
+    .badge-status { padding: 3px 8px; border-radius: 4px; font-size: 10.5px; font-weight: 700; background: rgba(59, 130, 246, 0.15); color: #93C5FD; }
+
+    #loading-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(11, 17, 32, 0.92);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 200;
+      gap: 14px;
+    }
+
+    .spinner-ring {
+      width: 44px;
+      height: 44px;
+      border: 4px solid #1E293B;
+      border-top: 4px solid var(--accent-yellow);
+      border-radius: 50%;
+      animation: spin 0.9s linear infinite;
+    }
+
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+    @media (max-width: 1150px) {
+      .top-analytics-grid, .grid-2-cols { grid-template-columns: 1fr; }
+      .filters-bar { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+<div id="loading-overlay">
+  <div class="spinner-ring"></div>
+  <div style="font-weight:700; font-size:14px; color:#F8FAFC;">Sincronizando Pending Lost MWH - MXRC03...</div>
+  <div style="font-size:12px; color:#94A3B8;">Consultando hoja Seguimiento en tiempo real</div>
+</div>
+
+<header class="topbar">
+  <div class="brand-title">
+    <span class="brand-badge">Loss Prevention</span>
+    <div>
+      <h1>Pending Lost MWH — MXRC03</h1>
+      <div class="brand-sub" id="last-sync">Conectado a hoja Seguimiento</div>
+    </div>
+  </div>
+  <div class="topbar-controls">
+    <button class="btn-refresh" onclick="cargarDatos()">🔄 Actualizar Datos</button>
+    <button class="btn-clear" onclick="limpiarTodosLosFiltros()">🗑️ Limpiar Multifiltros</button>
+  </div>
+</header>
+
+<main class="container">
+
+  <!-- MULTIFILTROS DESPLEGABLES -->
+  <section class="filters-bar" id="filters-container"></section>
+
+  <!-- ETIQUETAS DE FILTROS ACTIVOS -->
+  <section class="active-pills-bar" id="active-pills-bar">
+    <span class="pills-title">Filtros activos:</span>
+    <div id="pills-list" style="display:flex; flex-wrap:wrap; gap:8px;"></div>
+  </section>
+
+  <!-- BLOQUE 1: 4 DONAS EN USD PENDING ($) + KPIs + SEGUIMIENTO TOTAL EN USD PENDING ($) -->
+  <section class="top-analytics-grid">
+    <div class="donuts-quad">
+      <!-- Gráfica 1: Análisis en USD Pending ($) -->
+      <div class="mini-chart-box">
+        <div class="chart-header">
+          <div class="chart-title-row">
+            <h3 class="chart-title">Análisis</h3>
+            <span class="tag">USD Pending ($)</span>
+          </div>
+          <div class="chart-desc">Total <strong>USD Pending ($)</strong> por tipo de <strong>Análisis</strong> (Col. AU)</div>
+        </div>
+        <div class="canvas-wrap-donut"><canvas id="chartAnalisis"></canvas></div>
+      </div>
+
+      <!-- Gráfica 2: Rango USD en USD Pending ($) -->
+      <div class="mini-chart-box">
+        <div class="chart-header">
+          <div class="chart-title-row">
+            <h3 class="chart-title">Rango USD</h3>
+            <span class="tag">USD Pending ($)</span>
+          </div>
+          <div class="chart-desc">Total <strong>USD Pending ($)</strong> según clasificación de <strong>Rango</strong> (Col. U)</div>
+        </div>
+        <div class="canvas-wrap-donut"><canvas id="chartRango"></canvas></div>
+      </div>
+
+      <!-- Gráfica 3: Categoría HV en USD Pending ($) -->
+      <div class="mini-chart-box">
+        <div class="chart-header">
+          <div class="chart-title-row">
+            <h3 class="chart-title">Categoría (HV)</h3>
+            <span class="tag">USD Pending ($)</span>
+          </div>
+          <div class="chart-desc">Total <strong>USD Pending ($)</strong> únicamente con valores de <strong>HV</strong> (Col. L)</div>
+        </div>
+        <div class="canvas-wrap-donut"><canvas id="chartHV"></canvas></div>
+      </div>
+
+      <!-- Gráfica 4: Próximo a pago en USD Pending ($) con Fecha de Pago -->
+      <div class="mini-chart-box">
+        <div class="chart-header">
+          <div class="chart-title-row">
+            <h3 class="chart-title">Próximo a pago</h3>
+            <span class="tag">USD Pending ($)</span>
+          </div>
+          <div class="chart-desc"><strong>USD Pending ($)</strong> por <strong>Análisis</strong> donde existe <strong>Fecha de pago</strong> (Col. Z)</div>
+        </div>
+        <div class="canvas-wrap-donut"><canvas id="chartProximoPago"></canvas></div>
+      </div>
+    </div>
+
+    <!-- Tarjetas KPI y Gráfica 5: Seguimiento total en USD Pending ($) -->
+    <div class="kpi-panel">
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-label">Pzs losteadas</div>
+          <div class="kpi-value" id="kpi-pzs-lost">0</div>
+          <div class="kpi-sub">Suma Qty inicial (Col. J)</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Total losteado</div>
+          <div class="kpi-value" id="kpi-usd-lost">$0</div>
+          <div class="kpi-sub">Suma USD Inicial (Col. P)</div>
+        </div>
+        <div class="kpi-card amber">
+          <div class="kpi-label">Pzs pendientes</div>
+          <div class="kpi-value" id="kpi-pzs-pend">0</div>
+          <div class="kpi-sub">Suma Qty pending (Col. X)</div>
+        </div>
+        <div class="kpi-card amber">
+          <div class="kpi-label">USD pendiente</div>
+          <div class="kpi-value" id="kpi-usd-pend">$0</div>
+          <div class="kpi-sub">Suma USD Pending (Col. V)</div>
+        </div>
+        <div class="kpi-card emerald">
+          <div class="kpi-label">Pzs seguimiento</div>
+          <div class="kpi-value" id="kpi-pzs-seg">0</div>
+          <div class="kpi-sub">Qty pending donde Col. AP = SEGUIMIENTO</div>
+        </div>
+        <div class="kpi-card emerald">
+          <div class="kpi-label">USD seguimiento</div>
+          <div class="kpi-value" id="kpi-usd-seg">$0</div>
+          <div class="kpi-sub">USD Pending donde Col. AP = SEGUIMIENTO</div>
+        </div>
+      </div>
+
+      <div class="mini-chart-box" style="flex:1;">
+        <div class="chart-header">
+          <div class="chart-title-row">
+            <h3 class="chart-title">Seguimiento total</h3>
+            <span class="tag">USD Pending ($)</span>
+          </div>
+          <div class="chart-desc">Total <strong>USD Pending ($)</strong> entre <strong>SEGUIMIENTO</strong> y <strong>SIN SEGUIMIENTO</strong> (Col. AP)</div>
+        </div>
+        <div class="canvas-wrap-donut" style="height:140px;"><canvas id="chartSeguimientoTotal"></canvas></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BLOQUE 2: AGING Y PRÓXIMAS A PAGO POR SEMANA EN USD PENDING ($) -->
+  <section class="grid-2-cols">
+    <div class="card-full">
+      <div class="chart-header">
+        <div class="chart-title-row">
+          <h3 class="chart-title">Aging (Días de antigüedad)</h3>
+          <span class="tag">USD Pending ($)</span>
+        </div>
+        <div class="chart-desc">Suma de <strong>USD Pending ($)</strong> (Col. V) por días de <strong>Aging</strong> (Col. C)</div>
+      </div>
+      <div class="canvas-wrap-bar"><canvas id="chartAging"></canvas></div>
+    </div>
+
+    <div class="card-full">
+      <div class="chart-header">
+        <div class="chart-title-row">
+          <h3 class="chart-title">Próximas a pago por Semana Pago</h3>
+          <span class="tag">USD Pending ($)</span>
+        </div>
+        <div class="chart-desc">Suma de <strong>USD Pending ($)</strong> por <strong>Semana Pago</strong> (Col. AB) desglosado por <strong>Análisis</strong> (Col. AU)</div>
+      </div>
+      <div class="canvas-wrap-bar"><canvas id="chartProximasSemana"></canvas></div>
+    </div>
+  </section>
+
+  <!-- BLOQUE 3: TABLA SEGUIMIENTO RELEVANTE (COLUMNAS ALINEADAS) -->
+  <section class="card-full">
+    <div class="chart-header">
+      <div class="chart-title-row">
+        <h3 class="chart-title">Seguimiento relevante (Top 25 Issues con mayor impacto pendiente)</h3>
+        <span class="tag" style="color:#FFE600;">Clic en Ubicación para ver detalle del Tote</span>
+      </div>
+      <div class="chart-desc">Ordenado de mayor a menor <strong>USD Pending ($)</strong> • Columnas alineadas exactamente a la hoja Seguimiento</div>
+    </div>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Aging</th>
+            <th>Issue</th>
+            <th>SKU</th>
+            <th>Título</th>
+            <th>Ubicación</th>
+            <th class="num-right">Qty pending</th>
+            <th class="num-right">USD Pending</th>
+            <th>HV</th>
+            <th>Comentarios</th>
+            <th>Análisis</th>
+            <th class="num-right">Piezas ticket indebidas</th>
+          </tr>
+        </thead>
+        <tbody id="tbody-relevante"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- BLOQUE 4: IMPACTO USD POR SEMANA Y MU'S LOSTEADOS -->
+  <section class="grid-2-cols">
+    <div class="card-full">
+      <div class="chart-header">
+        <div class="chart-title-row">
+          <h3 class="chart-title">Impacto USD por semana</h3>
+          <span class="tag">USD Inicial ($)</span>
+        </div>
+        <div class="chart-desc">Suma de <strong>USD Inicial ($)</strong> (Col. P) por <strong>Semana Lost</strong> (Col. A)</div>
+      </div>
+      <div class="canvas-wrap-bar"><canvas id="chartImpactoSemana"></canvas></div>
+    </div>
+
+    <div class="card-full">
+      <div class="chart-header">
+        <div class="chart-title-row">
+          <h3 class="chart-title">MU's Losteados por semana</h3>
+          <span class="tag">Conteo de MUs</span>
+        </div>
+        <div class="chart-desc">Conteo de <strong>Ubicaciones únicas</strong> (Col. I) por <strong>Semana Lost</strong> (Col. A)</div>
+      </div>
+      <div class="canvas-wrap-bar"><canvas id="chartMusSemana"></canvas></div>
+    </div>
+  </section>
+
+  <!-- BLOQUE 5: DETALLE AGING EN USD PENDING ($) -->
+  <section class="card-full">
+    <div class="chart-header">
+      <div class="chart-title-row">
+        <h3 class="chart-title">Detalle Aging por Tipo de Análisis</h3>
+        <span class="tag">USD Pending ($)</span>
+      </div>
+      <div class="chart-desc">Suma de <strong>USD Pending ($)</strong> (Col. V) por días de <strong>Aging</strong> (Col. C) apilado por <strong>Análisis</strong> (Col. AU)</div>
+    </div>
+    <div class="canvas-wrap-bar" style="height:270px;"><canvas id="chartDetalleAging"></canvas></div>
+  </section>
+
+  <!-- BLOQUE 6: TABLAS DE TOTES -->
+  <section class="grid-2-cols">
+    <div class="card-full">
+      <div class="chart-header">
+        <div class="chart-title-row">
+          <h3 class="chart-title">Totes perdidos</h3>
+          <span class="tag" style="color:#FFE600;">Clic en un Tote para ver detalle</span>
+        </div>
+        <div class="chart-desc">Ubicaciones con <strong>Análisis</strong> (Col. AU) vacío o igual a <strong>Seguimiento CCM</strong></div>
+      </div>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Ubicación (Tote)</th>
+              <th class="num-right">USD Pending</th>
+              <th class="num-right">Qty Inicial</th>
+              <th class="num-right">Qty Pending</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-totes-perdidos"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card-full">
+      <div class="chart-header">
+        <div class="chart-title-row">
+          <h3 class="chart-title">Totes localizados / con inconsistencia</h3>
+          <span class="tag" style="color:#FFE600;">Clic en un Tote para ver detalle</span>
+        </div>
+        <div class="chart-desc">Ubicaciones con cualquier otro <strong>Análisis</strong> (Col. AU) distinto a vacío o Seguimiento CCM</div>
+      </div>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Ubicación (Tote)</th>
+              <th class="num-right">USD Pending</th>
+              <th class="num-right">Qty Inicial</th>
+              <th class="num-right">Qty Pending</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-totes-localizados"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- MODAL DETALLE DE TOTE -->
+<div id="modal-tote" class="modal-backdrop" onclick="cerrarModalSiFondo(event)">
+  <div class="modal-card">
+    <div class="modal-header">
+      <div>
+        <h2 id="modal-tote-titulo">Detalle de Ubicación: ---</h2>
+        <p id="modal-tote-subtitulo">Desglose completo de registros asociados al contenedor</p>
+      </div>
+      <button class="btn-close-modal" onclick="cerrarModal()">✕ Cerrar</button>
+    </div>
+    <div class="modal-summary-strip">
+      <div class="m-stat"><span>Total Issues / Líneas</span><strong id="m-total-lineas">0</strong></div>
+      <div class="m-stat"><span>Qty Inicial Total</span><strong id="m-qty-ini">0</strong></div>
+      <div class="m-stat"><span>Qty Pending Total</span><strong id="m-qty-pend">0</strong></div>
+      <div class="m-stat"><span>USD Pending Total</span><strong id="m-usd-pend" style="color:#FFE600;">$0.00</strong></div>
+    </div>
+    <div class="modal-body">
+      <div class="table-wrapper" style="max-height:52vh;">
+        <table>
+          <thead>
+            <tr>
+              <th>Semana</th>
+              <th>Aging</th>
+              <th>Issue</th>
+              <th>Inbound</th>
+              <th>SKU</th>
+              <th>Título</th>
+              <th class="num-right">Qty Ini</th>
+              <th class="num-right">Qty Pend</th>
+              <th class="num-right">USD Pend</th>
+              <th>Fecha Pago</th>
+              <th>Status</th>
+              <th>Análisis</th>
+              <th>Comentarios</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-modal-detalle"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const DASHBOARD_API_URL = "https://pending-lost-api.abraham-velazquezvelazquez.workers.dev";
+
+const CONFIG_FILTROS = [
+  { campo: "semanaLost",        etiqueta: "Semana Lost (Col. A)" },
+  { campo: "hv",                etiqueta: "Categoría HV (Col. L)" },
+  { campo: "rango",             etiqueta: "Rango USD (Col. U)" },
+  { campo: "analisis",          etiqueta: "Análisis (Col. AU)" },
+  { campo: "semanaPago",        etiqueta: "Semana Pago (Col. AB)" },
+  { campo: "semanaSeguimiento", etiqueta: "Sem. Seguimiento (Col. AQ)" },
+  { campo: "seguimiento",       etiqueta: "Seguimiento (Col. AP)" }
+];
+
+let rawRegistros = [];
+let registrosFiltrados = [];
+const estadoFiltros = {
+  semanaLost: new Set(),
+  hv: new Set(),
+  rango: new Set(),
+  analisis: new Set(),
+  semanaPago: new Set(),
+  semanaSeguimiento: new Set(),
+  seguimiento: new Set(),
+  aging: new Set()
 };
 
-function base64UrlEncode(input) {
-  let bytes = typeof input === "string" ? new TextEncoder().encode(input) : new Uint8Array(input);
-  let binary = "";
-  for (let i = 0; i < bytes.byteLength; i++) {
-    binary += String.fromCharCode(bytes[i]);
+const charts = {};
+const PALETA_CORP = [
+  "#3B82F6", "#F59E0B", "#A855F7", "#10B981", "#06B6D4",
+  "#EC4899", "#6366F1", "#EAB308", "#14B8A6", "#F97316", "#64748B"
+];
+
+Chart.defaults.color = "#94A3B8";
+Chart.defaults.borderColor = "rgba(255,255,255,0.06)";
+Chart.defaults.font.family = "'Inter', sans-serif";
+Chart.defaults.font.size = 11;
+
+// Formateador de moneda USD para tooltips de todas las gráficas
+const fmtUSD = (val) => "$" + Number(val || 0).toLocaleString("es-MX", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " USD";
+
+window.addEventListener("DOMContentLoaded", () => {
+  construirContenedoresMultifiltro();
+  cargarDatos();
+
+  document.addEventListener("click", (e) => {
+    if (!e.target.closest(".filter-item")) {
+      document.querySelectorAll(".multi-menu.open").forEach(m => m.classList.remove("open"));
+    }
+  });
+});
+
+async function cargarDatos() {
+  const overlay = document.getElementById("loading-overlay");
+  overlay.style.display = "flex";
+
+  try {
+    const resp = await fetch(DASHBOARD_API_URL);
+    const data = await resp.json();
+    if (data.error) throw new Error(data.error);
+
+    rawRegistros = (data.registros || []).map(r => ({
+      ...r,
+      analisisNorm: r.analisis || "Sin análisis",
+      agingStr: r.agingRaw !== "" ? String(Math.round(r.aging)) : ""
+    }));
+
+    const hora = new Date().toLocaleTimeString("es-MX", { hour: "2-digit", minute: "2-digit" });
+    document.getElementById("last-sync").textContent =
+      `Conectado a hoja Seguimiento • ${rawRegistros.length.toLocaleString("es-MX")} registros • Actualizado a las ${hora}`;
+
+    poblarOpcionesMultifiltros();
+    aplicarFiltros();
+  } catch (err) {
+    alert("❌ Error al cargar datos: " + err.message);
+  } finally {
+    overlay.style.display = "none";
   }
-  return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 }
 
-async function getGoogleToken(clientEmail, rawPrivateKey) {
-  const header = base64UrlEncode(JSON.stringify({ alg: "RS256", typ: "JWT" }));
-  const now = Math.floor(Date.now() / 1000);
-  const claim = base64UrlEncode(JSON.stringify({
-    iss: clientEmail.trim(),
-    scope: "https://www.googleapis.com/auth/spreadsheets.readonly",
-    aud: "https://oauth2.googleapis.com/token",
-    exp: now + 3600,
-    iat: now - 60
-  }));
+/* =========================================================================
+   MULTIFILTROS
+   ========================================================================= */
+function construirContenedoresMultifiltro() {
+  const contenedor = document.getElementById("filters-container");
+  contenedor.innerHTML = CONFIG_FILTROS.map(f => `
+    <div class="filter-item">
+      <label>${f.etiqueta}</label>
+      <button type="button" class="multi-btn" id="btn-filter-${f.campo}" onclick="toggleMenuFiltro('${f.campo}')">
+        <span id="label-filter-${f.campo}">Todos</span>
+        <span>▾</span>
+      </button>
+      <div class="multi-menu" id="menu-filter-${f.campo}"></div>
+    </div>
+  `).join("");
+}
 
-  let keyBody = rawPrivateKey;
-  const match = rawPrivateKey.match(/-----BEGIN PRIVATE KEY-----([\s\S]*?)-----END PRIVATE KEY-----/);
-  if (match && match[1]) keyBody = match[1];
+function toggleMenuFiltro(campo) {
+  const menu = document.getElementById("menu-filter-" + campo);
+  const estabaAbierto = menu.classList.contains("open");
+  document.querySelectorAll(".multi-menu.open").forEach(m => m.classList.remove("open"));
+  if (!estabaAbierto) menu.classList.add("open");
+}
 
-  const cleanBase64 = keyBody.replace(/\\n/g, "").replace(/[^A-Za-z0-9+/=]/g, "");
-  const binaryDer = Uint8Array.from(atob(cleanBase64), c => c.charCodeAt(0));
-  const cryptoKey = await crypto.subtle.importKey(
-    "pkcs8", binaryDer.buffer, { name: "RSASSA-PKCS1-v1_5", hash: "SHA-256" }, false, ["sign"]
-  );
+function poblarOpcionesMultifiltros() {
+  CONFIG_FILTROS.forEach(f => {
+    const prop = f.campo === "analisis" ? "analisisNorm" : f.campo;
+    const unicos = [...new Set(rawRegistros.map(r => r[prop]).filter(v => v !== ""))].sort();
+    const menu = document.getElementById("menu-filter-" + f.campo);
 
-  const unsignedToken = `${header}.${claim}`;
-  const signature = await crypto.subtle.sign("RSASSA-PKCS1-v1_5", cryptoKey, new TextEncoder().encode(unsignedToken));
-  const jwt = `${unsignedToken}.${base64UrlEncode(signature)}`;
+    menu.innerHTML = unicos.map(val => {
+      const checked = estadoFiltros[f.campo].has(val) ? "checked" : "";
+      const valEscapado = val.replace(/"/g, "&quot;");
+      return `
+        <label class="multi-option">
+          <input type="checkbox" value="${valEscapado}" ${checked} onchange="alternarValorFiltro('${f.campo}', this.value)">
+          <span>${val}</span>
+        </label>
+      `;
+    }).join("");
+  });
+}
 
-  const res = await fetch("https://oauth2.googleapis.com/token", {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: `grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer&assertion=${jwt}`
+function alternarValorFiltro(campo, valor) {
+  if (!valor) return;
+  const setActual = estadoFiltros[campo];
+  if (setActual.has(valor)) {
+    setActual.delete(valor);
+  } else {
+    setActual.add(valor);
+  }
+  poblarOpcionesMultifiltros();
+  aplicarFiltros();
+}
+
+function limpiarTodosLosFiltros() {
+  Object.keys(estadoFiltros).forEach(k => estadoFiltros[k].clear());
+  poblarOpcionesMultifiltros();
+  aplicarFiltros();
+}
+
+function actualizarIndicadoresDeFiltro() {
+  CONFIG_FILTROS.forEach(f => {
+    const sel = estadoFiltros[f.campo];
+    const btn = document.getElementById("btn-filter-" + f.campo);
+    const lbl = document.getElementById("label-filter-" + f.campo);
+
+    if (sel.size === 0) {
+      btn.classList.remove("has-selection");
+      lbl.textContent = "Todos";
+    } else if (sel.size === 1) {
+      btn.classList.add("has-selection");
+      lbl.textContent = [...sel][0];
+    } else {
+      btn.classList.add("has-selection");
+      lbl.textContent = `${sel.size} seleccionados`;
+    }
   });
 
-  const data = await res.json();
-  if (!data.access_token) throw new Error("Error de autenticación Google: " + JSON.stringify(data));
-  return data.access_token;
+  const pillsBar = document.getElementById("active-pills-bar");
+  const pillsList = document.getElementById("pills-list");
+  const nombresBonitos = {
+    semanaLost: "Semana Lost",
+    hv: "HV",
+    rango: "Rango USD",
+    analisis: "Análisis",
+    semanaPago: "Semana Pago",
+    semanaSeguimiento: "Sem. Seguimiento",
+    seguimiento: "Seguimiento",
+    aging: "Aging (días)"
+  };
+
+  let htmlPills = "";
+  Object.entries(estadoFiltros).forEach(([campo, setValores]) => {
+    setValores.forEach(val => {
+      const valEsc = val.replace(/'/g, "\\'");
+      htmlPills += `
+        <span class="filter-pill">
+          <span>${nombresBonitos[campo]}: <strong>${val}</strong></span>
+          <button type="button" onclick="alternarValorFiltro('${campo}', '${valEsc}')" title="Quitar filtro">✕</button>
+        </span>
+      `;
+    });
+  });
+
+  if (htmlPills) {
+    pillsList.innerHTML = htmlPills;
+    pillsBar.style.display = "flex";
+  } else {
+    pillsBar.style.display = "none";
+  }
 }
+
+function aplicarFiltros() {
+  registrosFiltrados = rawRegistros.filter(r => {
+    if (estadoFiltros.semanaLost.size > 0 && !estadoFiltros.semanaLost.has(r.semanaLost)) return false;
+    if (estadoFiltros.hv.size > 0 && !estadoFiltros.hv.has(r.hv)) return false;
+    if (estadoFiltros.rango.size > 0 && !estadoFiltros.rango.has(r.rango)) return false;
+    if (estadoFiltros.analisis.size > 0 && !estadoFiltros.analisis.has(r.analisisNorm)) return false;
+    if (estadoFiltros.semanaPago.size > 0 && !estadoFiltros.semanaPago.has(r.semanaPago)) return false;
+    if (estadoFiltros.semanaSeguimiento.size > 0 && !estadoFiltros.semanaSeguimiento.has(r.semanaSeguimiento)) return false;
+    if (estadoFiltros.seguimiento.size > 0 && !estadoFiltros.seguimiento.has(r.seguimiento)) return false;
+    if (estadoFiltros.aging.size > 0 && !estadoFiltros.aging.has(r.agingStr)) return false;
+    return true;
+  });
+
+  actualizarIndicadoresDeFiltro();
+  actualizarKPIs();
+  renderizarTodasLasGraficas();
+  renderizarTablas();
+}
+
+/* =========================================================================
+   KPIs
+   ========================================================================= */
+function fmtCompacto(num, esMoneda = false) {
+  const pref = esMoneda ? "$" : "";
+  if (Math.abs(num) >= 1_000_000) return pref + (num / 1_000_000).toLocaleString("es-MX", { maximumFractionDigits: 2 }) + " M";
+  if (Math.abs(num) >= 10_000) return pref + (num / 1_000).toLocaleString("es-MX", { maximumFractionDigits: 1 }) + " mil";
+  return pref + num.toLocaleString("es-MX", { maximumFractionDigits: esMoneda ? 2 : 0 });
+}
+
+function actualizarKPIs() {
+  let pzsLost = 0, usdLost = 0, pzsPend = 0, usdPend = 0, pzsSeg = 0, usdSeg = 0;
+
+  for (const r of registrosFiltrados) {
+    pzsLost += r.qtyInicial;
+    usdLost += r.usdInicial;
+    pzsPend += r.qtyPending;
+    usdPend += r.usdPending;
+
+    if (r.seguimiento.toUpperCase() === "SEGUIMIENTO") {
+      pzsSeg += r.qtyPending;
+      usdSeg += r.usdPending;
+    }
+  }
+
+  document.getElementById("kpi-pzs-lost").textContent = fmtCompacto(pzsLost, false);
+  document.getElementById("kpi-usd-lost").textContent = fmtCompacto(usdLost, true);
+  document.getElementById("kpi-pzs-pend").textContent = fmtCompacto(pzsPend, false);
+  document.getElementById("kpi-usd-pend").textContent = fmtCompacto(usdPend, true);
+  document.getElementById("kpi-pzs-seg").textContent = fmtCompacto(pzsSeg, false);
+  document.getElementById("kpi-usd-seg").textContent = fmtCompacto(usdSeg, true);
+}
+
+/* =========================================================================
+   GRÁFICAS (TODAS EN USD PENDING $)
+   ========================================================================= */
+function agruparSuma(lista, keyFn, valFn) {
+  const map = {};
+  for (const item of lista) {
+    const k = keyFn(item);
+    if (!k) continue;
+    map[k] = (map[k] || 0) + valFn(item);
+  }
+  return Object.entries(map).sort((a, b) => b[1] - a[1]);
+}
+
+function crearDonaUSD(canvasId, etiquetas, valores, campoFiltro, colores = PALETA_CORP) {
+  if (charts[canvasId]) charts[canvasId].destroy();
+  const ctx = document.getElementById(canvasId).getContext("2d");
+
+  charts[canvasId] = new Chart(ctx, {
+    type: "doughnut",
+    data: {
+      labels: etiquetas,
+      datasets: [{
+        data: valores,
+        backgroundColor: colores,
+        borderWidth: 1.5,
+        borderColor: "#131C31"
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: "58%",
+      onClick: (event, elements) => {
+        if (elements.length > 0 && campoFiltro) {
+          alternarValorFiltro(campoFiltro, etiquetas[elements[0].index]);
+        }
+      },
+      plugins: {
+        legend: { position: "right", labels: { boxWidth: 10, font: { size: 10 } } },
+        tooltip: {
+          callbacks: {
+            label: (ctx) => {
+              const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+              const pct = total > 0 ? ((ctx.parsed / total) * 100).toFixed(1) : 0;
+              return ` ${ctx.label}: ${fmtUSD(ctx.parsed)} (${pct}%)`;
+            }
+          }
+        }
+      }
+    }
+  });
+}
+
+function crearBarrasInteractivas(canvasId, etiquetas, datasets, campoFiltroX, apilado = false, esMoneda = true) {
+  if (charts[canvasId]) charts[canvasId].destroy();
+  const ctx = document.getElementById(canvasId).getContext("2d");
+
+  charts[canvasId] = new Chart(ctx, {
+    type: "bar",
+    data: { labels: etiquetas, datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        x: { stacked: apilado },
+        y: {
+          stacked: apilado,
+          ticks: {
+            callback: (v) => esMoneda ? "$" + Number(v).toLocaleString("es-MX") : Number(v).toLocaleString("es-MX")
+          }
+        }
+      },
+      onClick: (event, elements) => {
+        if (elements.length > 0 && campoFiltroX) {
+          alternarValorFiltro(campoFiltroX, etiquetas[elements[0].index]);
+        }
+      },
+      plugins: {
+        legend: {
+          display: apilado,
+          position: "top",
+          labels: { boxWidth: 10, font: { size: 10 } }
+        },
+        tooltip: {
+          callbacks: {
+            label: (ctx) => {
+              const valStr = esMoneda ? fmtUSD(ctx.parsed.y) : `${Number(ctx.parsed.y).toLocaleString("es-MX")} MU's`;
+              return ` ${ctx.dataset.label}: ${valStr}`;
+            }
+          }
+        }
+      }
+    }
+  });
+}
+
+function renderizarTodasLasGraficas() {
+  const soloConPending = registrosFiltrados.filter(r => r.usdPending > 0);
+
+  // 1. Análisis -> Total USD Pending ($) por tipo de Análisis (Col. AU)
+  const g1 = agruparSuma(soloConPending, r => r.analisisNorm, r => r.usdPending);
+  crearDonaUSD("chartAnalisis", g1.map(d => d[0]), g1.map(d => d[1]), "analisis");
+
+  // 2. Rango USD -> Total USD Pending ($) según Rango (Col. U)
+  const g2 = agruparSuma(soloConPending, r => r.rango || "Sin rango", r => r.usdPending);
+  crearDonaUSD("chartRango", g2.map(d => d[0]), g2.map(d => d[1]), "rango");
+
+  // 3. Categoría (HV) -> Total USD Pending ($) únicamente donde Col. L (HV) contiene dato
+  const soloConHV = soloConPending.filter(r => r.hv !== "" && r.hv !== "-");
+  const g3 = agruparSuma(soloConHV, r => r.hv, r => r.usdPending);
+  crearDonaUSD("chartHV", g3.map(d => d[0]), g3.map(d => d[1]), "hv", ["#3B82F6", "#F59E0B", "#10B981"]);
+
+  // 4. Próximo a pago -> Total USD Pending ($) por Análisis solo donde Col. Z (Fecha de pago) tenga fecha
+  const conFechaPago = soloConPending.filter(r => r.fechaPago !== "");
+  const g4 = agruparSuma(conFechaPago, r => r.analisisNorm, r => r.usdPending);
+  crearDonaUSD("chartProximoPago", g4.map(d => d[0]), g4.map(d => d[1]), "analisis");
+
+  // 5. Seguimiento total -> Total USD Pending ($) por Seguimiento vs Sin Seguimiento (Col. AP)
+  const g5 = agruparSuma(soloConPending, r => r.seguimiento || "SIN SEGUIMIENTO", r => r.usdPending);
+  crearDonaUSD("chartSeguimientoTotal", g5.map(d => d[0]), g5.map(d => d[1]), "seguimiento", ["#F59E0B", "#3B82F6", "#64748B"]);
+
+  // 6. Aging -> Total USD Pending ($) por días de Aging (Col. C)
+  const mapAging = {};
+  for (const r of soloConPending) {
+    if (r.agingStr !== "") mapAging[r.agingStr] = (mapAging[r.agingStr] || 0) + r.usdPending;
+  }
+  const g6 = Object.entries(mapAging).sort((a, b) => Number(a[0]) - Number(b[0]));
+  crearBarrasInteractivas(
+    "chartAging",
+    g6.map(d => d[0]),
+    [{ label: "USD Pending", data: g6.map(d => d[1]), backgroundColor: "#F59E0B", borderRadius: 4 }],
+    "aging",
+    false,
+    true
+  );
+
+  // 7. Próximas a pago por Semana Pago -> Total USD Pending ($) por Semana Pago (Col. AB) y Análisis
+  const conSemanaPago = soloConPending.filter(r => r.semanaPago !== "");
+  const semanasPago = [...new Set(conSemanaPago.map(r => r.semanaPago))].sort();
+  const tiposAnalisisPago = [...new Set(conSemanaPago.map(r => r.analisisNorm))];
+  const ds7 = tiposAnalisisPago.map((an, idx) => ({
+    label: an,
+    backgroundColor: PALETA_CORP[idx % PALETA_CORP.length],
+    data: semanasPago.map(sem =>
+      conSemanaPago.filter(r => r.semanaPago === sem && r.analisisNorm === an)
+                   .reduce((acc, cur) => acc + cur.usdPending, 0)
+    )
+  }));
+  crearBarrasInteractivas("chartProximasSemana", semanasPago, ds7, "semanaPago", true, true);
+
+  // 8 y 9. Impacto USD por semana y MU's Losteados por semana
+  const mapSemUsd = {};
+  const mapSemMus = {};
+  for (const r of registrosFiltrados) {
+    if (!r.semanaLost) continue;
+    mapSemUsd[r.semanaLost] = (mapSemUsd[r.semanaLost] || 0) + r.usdInicial;
+    if (!mapSemMus[r.semanaLost]) mapSemMus[r.semanaLost] = new Set();
+    if (r.ubicacion) mapSemMus[r.semanaLost].add(r.ubicacion);
+  }
+  const semanasLost = Object.keys(mapSemUsd).sort();
+
+  crearBarrasInteractivas(
+    "chartImpactoSemana",
+    semanasLost,
+    [{ label: "USD Inicial", data: semanasLost.map(s => mapSemUsd[s]), backgroundColor: "#3B82F6", borderRadius: 4 }],
+    "semanaLost",
+    false,
+    true
+  );
+
+  crearBarrasInteractivas(
+    "chartMusSemana",
+    semanasLost,
+    [{ label: "MU's Únicos", data: semanasLost.map(s => mapSemMus[s] ? mapSemMus[s].size : 0), backgroundColor: "#06B6D4", borderRadius: 4 }],
+    "semanaLost",
+    false,
+    false
+  );
+
+  // 10. Detalle Aging -> Total USD Pending ($) por Aging apilado por Análisis
+  const agingsUnicos = g6.map(d => d[0]);
+  const analisisTodos = [...new Set(soloConPending.map(r => r.analisisNorm))];
+  const ds10 = analisisTodos.map((an, idx) => ({
+    label: an,
+    backgroundColor: PALETA_CORP[idx % PALETA_CORP.length],
+    data: agingsUnicos.map(ag =>
+      soloConPending.filter(r => r.agingStr === ag && r.analisisNorm === an)
+                    .reduce((acc, cur) => acc + cur.usdPending, 0)
+    )
+  }));
+  crearBarrasInteractivas("chartDetalleAging", agingsUnicos, ds10, "aging", true, true);
+}
+
+/* =========================================================================
+   TABLAS EJECUTIVAS (COLUMNAS CORREGIDAS)
+   ========================================================================= */
+function renderizarTablas() {
+  const topRelevante = [...registrosFiltrados]
+    .filter(r => r.usdPending > 0)
+    .sort((a, b) => b.usdPending - a.usdPending)
+    .slice(0, 25);
+
+  const maxUsdRel = topRelevante.length > 0 ? topRelevante[0].usdPending : 1;
+  document.getElementById("tbody-relevante").innerHTML = topRelevante.map(r => {
+    const alpha = Math.max(0.12, (r.usdPending / maxUsdRel) * 0.65).toFixed(2);
+    return `
+      <tr class="clickable-tote" onclick="abrirDetalleTote('${r.ubicacion.replace(/'/g, "\\'")}')">
+        <td><strong>${r.agingRaw}</strong></td>
+        <td>${r.issue}</td>
+        <td>${r.sku}</td>
+        <td style="max-width:250px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${r.titulo}">${r.titulo}</td>
+        <td><span class="tote-link">${r.ubicacion}</span></td>
+        <td class="num-right">${r.qtyPending.toLocaleString("es-MX")}</td>
+        <td class="num-right" style="background:rgba(239, 68, 68, ${alpha});">$${r.usdPending.toLocaleString("es-MX", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+        <td>${r.hv || "—"}</td>
+        <td style="max-width:220px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${r.comentarios}">${r.comentarios || "—"}</td>
+        <td>${r.analisisNorm}</td>
+        <td class="num-right">${r.piezasIndebidas.toLocaleString("es-MX")}</td>
+      </tr>
+    `;
+  }).join("");
+
+  const mapPerdidos = {};
+  const mapLocalizados = {};
+
+  for (const r of registrosFiltrados) {
+    if (!r.ubicacion) continue;
+    const anNorm = r.analisis.trim().toUpperCase();
+    const esPerdido = (anNorm === "" || anNorm === "SEGUIMIENTO CCM");
+
+    const destino = esPerdido ? mapPerdidos : mapLocalizados;
+    if (!destino[r.ubicacion]) {
+      destino[r.ubicacion] = { ubicacion: r.ubicacion, usdPending: 0, qtyInicial: 0, qtyPending: 0 };
+    }
+    destino[r.ubicacion].usdPending += r.usdPending;
+    destino[r.ubicacion].qtyInicial += r.qtyInicial;
+    destino[r.ubicacion].qtyPending += r.qtyPending;
+  }
+
+  const listaPerdidos = Object.values(mapPerdidos).filter(t => t.usdPending > 0 || t.qtyPending > 0).sort((a, b) => b.usdPending - a.usdPending);
+  const listaLocalizados = Object.values(mapLocalizados).filter(t => t.usdPending > 0 || t.qtyPending > 0).sort((a, b) => b.usdPending - a.usdPending);
+
+  const maxPerd = listaPerdidos.length > 0 ? listaPerdidos[0].usdPending : 1;
+  document.getElementById("tbody-totes-perdidos").innerHTML = listaPerdidos.map(t => {
+    const alpha = Math.max(0.15, (t.usdPending / maxPerd) * 0.7).toFixed(2);
+    return `
+      <tr class="clickable-tote" onclick="abrirDetalleTote('${t.ubicacion.replace(/'/g, "\\'")}')">
+        <td><span class="tote-link">${t.ubicacion}</span></td>
+        <td class="num-right" style="background:rgba(220, 38, 38, ${alpha});">$${t.usdPending.toLocaleString("es-MX", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+        <td class="num-right">${t.qtyInicial.toLocaleString("es-MX")}</td>
+        <td class="num-right">${t.qtyPending.toLocaleString("es-MX")}</td>
+      </tr>
+    `;
+  }).join("");
+
+  const maxLoc = listaLocalizados.length > 0 ? listaLocalizados[0].usdPending : 1;
+  document.getElementById("tbody-totes-localizados").innerHTML = listaLocalizados.map(t => {
+    const alpha = Math.max(0.15, (t.usdPending / maxLoc) * 0.7).toFixed(2);
+    return `
+      <tr class="clickable-tote" onclick="abrirDetalleTote('${t.ubicacion.replace(/'/g, "\\'")}')">
+        <td><span class="tote-link">${t.ubicacion}</span></td>
+        <td class="num-right" style="background:rgba(59, 130, 246, ${alpha});">$${t.usdPending.toLocaleString("es-MX", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+        <td class="num-right">${t.qtyInicial.toLocaleString("es-MX")}</td>
+        <td class="num-right">${t.qtyPending.toLocaleString("es-MX")}</td>
+      </tr>
+    `;
+  }).join("");
+}
+
+function abrirDetalleTote(ubicacion) {
+  if (!ubicacion) return;
+  const items = registrosFiltrados.filter(r => r.ubicacion === ubicacion);
+
+  let sumIni = 0, sumPend = 0, sumUsd = 0;
+  for (const it of items) {
+    sumIni += it.qtyInicial;
+    sumPend += it.qtyPending;
+    sumUsd += it.usdPending;
+  }
+
+  document.getElementById("modal-tote-titulo").textContent = `Detalle de Ubicación (Tote): ${ubicacion}`;
+  document.getElementById("modal-tote-subtitulo").textContent = `Mostrando ${items.length} registro(s) filtrados en la hoja Seguimiento`;
+  document.getElementById("m-total-lineas").textContent = items.length;
+  document.getElementById("m-qty-ini").textContent = sumIni.toLocaleString("es-MX");
+  document.getElementById("m-qty-pend").textContent = sumPend.toLocaleString("es-MX");
+  document.getElementById("m-usd-pend").textContent = "$" + sumUsd.toLocaleString("es-MX", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+  document.getElementById("tbody-modal-detalle").innerHTML = items.map(it => `
+    <tr>
+      <td>${it.semanaLost}</td>
+      <td><strong>${it.agingRaw}</strong></td>
+      <td>${it.issue}</td>
+      <td>${it.inbound}</td>
+      <td>${it.sku}</td>
+      <td>${it.titulo}</td>
+      <td class="num-right">${it.qtyInicial.toLocaleString("es-MX")}</td>
+      <td class="num-right">${it.qtyPending.toLocaleString("es-MX")}</td>
+      <td class="num-right" style="color:#FFE600;">$${it.usdPending.toLocaleString("es-MX", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+      <td>${it.fechaPago || "—"}</td>
+      <td><span class="badge-status">${it.status || "—"}</span></td>
+      <td>${it.analisisNorm}</td>
+      <td>${it.comentarios || "—"}</td>
+    </tr>
+  `).join("");
+
+  document.getElementById("modal-tote").style.display = "flex";
+}
+
+function cerrarModal() { document.getElementById("modal-tote").style.display = "none"; }
+function cerrarModalSiFondo(e) { if (e.target.id === "modal-tote") cerrarModal(); }
+</script>
+</body>
+</html>
