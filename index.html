@@ -850,7 +850,7 @@
     <div class="modal-header">
       <div>
         <h2>✉️ Borrador de Reporte Ejecutivo — Loss Prevention MXRC03</h2>
-        <p>Generado automáticamente con los datos y filtros activos del tablero</p>
+        <p>Generado automáticamente con los datos, gráficas y filtros activos del tablero</p>
       </div>
       <button class="btn-close-modal" onclick="cerrarModal('modal-reporte')">✕ Cerrar</button>
     </div>
@@ -858,13 +858,13 @@
     <div class="email-actions-bar">
       <div style="display:flex; gap:10px; flex-wrap:wrap;">
         <button type="button" class="btn-copy-rich" id="btn-copiar-correo" onclick="copiarReporteCorreo()">
-          📋 Copiar reporte con formato (Para pegar en Gmail)
+          📋 Copiar reporte con gráficas y formato (Para pegar en Gmail)
         </button>
         <a id="link-abrir-gmail" href="#" target="_blank" class="btn-open-gmail">
           🚀 Abrir redacción en Gmail
         </a>
       </div>
-      <span style="font-size:11.5px; color:#94A3B8;">Tip: Pega con <strong>Ctrl + V</strong> en Gmail para conservar negritas y viñetas</span>
+      <span style="font-size:11.5px; color:#94A3B8;">Tip: Pega con <strong>Ctrl + V</strong> en Gmail para conservar gráficas, negritas y cursivas</span>
     </div>
 
     <div class="modal-body" style="background:#0F172A;">
@@ -1459,9 +1459,6 @@ function abrirDetalleTote(ubicacion) {
 }
 
 /* =========================================================================
-   GENERADOR DE BORRADOR DE CORREO CORPORATIVO (ESTILO REFERENCIA)
-   ========================================================================= */
-/* =========================================================================
    GENERADOR DE BORRADOR DE CORREO CORPORATIVO CON GRÁFICAS INCRUSTADAS
    ========================================================================= */
 function obtenerEmojiAnalisis(nombre) {
@@ -1476,7 +1473,6 @@ function obtenerEmojiAnalisis(nombre) {
   return "📌";
 }
 
-// Convierte un canvas de Chart.js a imagen PNG con fondo blanco corporativo para correo
 function capturarGraficaParaCorreo(canvasId, tituloGrafica) {
   const srcCanvas = document.getElementById(canvasId);
   if (!srcCanvas) return "";
@@ -1487,16 +1483,13 @@ function capturarGraficaParaCorreo(canvasId, tituloGrafica) {
   tempCanvas.height = srcCanvas.height + paddingTop;
 
   const ctx = tempCanvas.getContext("2d");
-  // Fondo blanco limpio para lectura perfecta en Gmail / Outlook
   ctx.fillStyle = "#FFFFFF";
   ctx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
 
-  // Título superior de la gráfica
   ctx.fillStyle = "#1B365D";
   ctx.font = "bold 14px Inter, Arial, sans-serif";
   ctx.fillText(tituloGrafica, 12, 19);
 
-  // Dibujar la gráfica original debajo del título
   ctx.drawImage(srcCanvas, 0, paddingTop);
   return tempCanvas.toDataURL("image/png");
 }
@@ -1692,7 +1685,7 @@ async function copiarReporteCorreo() {
     btn.textContent = "✅ ¡Copiado con gráficas y formato! Pega en Gmail (Ctrl + V)";
     btn.style.background = "#10B981";
     setTimeout(() => {
-      btn.textContent = "📋 Copiar reporte con formato (Para pegar en Gmail)";
+      btn.textContent = "📋 Copiar reporte con gráficas y formato (Para pegar en Gmail)";
     }, 3500);
   } catch (err) {
     const range = document.createRange();
@@ -1704,3 +1697,14 @@ async function copiarReporteCorreo() {
     btn.textContent = "✅ ¡Copiado al portapapeles!";
   }
 }
+
+function cerrarModal(idModal) {
+  document.getElementById(idModal).style.display = "none";
+}
+
+function cerrarModalSiFondo(e, idModal) {
+  if (e.target.id === idModal) cerrarModal(idModal);
+}
+</script>
+</body>
+</html>
