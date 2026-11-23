@@ -1461,6 +1461,9 @@ function abrirDetalleTote(ubicacion) {
 /* =========================================================================
    GENERADOR DE BORRADOR DE CORREO CORPORATIVO (ESTILO REFERENCIA)
    ========================================================================= */
+/* =========================================================================
+   GENERADOR DE BORRADOR DE CORREO CORPORATIVO CON GRÁFICAS INCRUSTADAS
+   ========================================================================= */
 function obtenerEmojiAnalisis(nombre) {
   const n = nombre.toUpperCase();
   if (n.includes("LOCALIZADO")) return "🔍";
@@ -1473,9 +1476,35 @@ function obtenerEmojiAnalisis(nombre) {
   return "📌";
 }
 
+// Convierte un canvas de Chart.js a imagen PNG con fondo blanco corporativo para correo
+function capturarGraficaParaCorreo(canvasId, tituloGrafica) {
+  const srcCanvas = document.getElementById(canvasId);
+  if (!srcCanvas) return "";
+
+  const tempCanvas = document.createElement("canvas");
+  const paddingTop = 28;
+  tempCanvas.width = srcCanvas.width;
+  tempCanvas.height = srcCanvas.height + paddingTop;
+
+  const ctx = tempCanvas.getContext("2d");
+  // Fondo blanco limpio para lectura perfecta en Gmail / Outlook
+  ctx.fillStyle = "#FFFFFF";
+  ctx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+
+  // Título superior de la gráfica
+  ctx.fillStyle = "#1B365D";
+  ctx.font = "bold 14px Inter, Arial, sans-serif";
+  ctx.fillText(tituloGrafica, 12, 19);
+
+  // Dibujar la gráfica original debajo del título
+  ctx.drawImage(srcCanvas, 0, paddingTop);
+  return tempCanvas.toDataURL("image/png");
+}
+
 function abrirModalReporte() {
   const pendientes = registrosFiltrados.filter(r => r.usdPending > 0);
   const totalUsdPend = pendientes.reduce((acc, r) => acc + r.usdPending, 0);
+  const totalPzsPend = pendientes.reduce((acc, r) => acc + r.qtyPending, 0);
 
   // 1. Piezas de Alto Valor (HV === "HV")
   const itemsHV = pendientes.filter(r => r.hv.toUpperCase() === "HV");
@@ -1484,109 +1513,164 @@ function abrirModalReporte() {
   const pctHVSeg = usdHV > 0 ? ((usdHVSeg / usdHV) * 100).toFixed(1) : "0.0";
   const desgloseHV = agruparSuma(itemsHV, r => r.analisisNorm, r => r.usdPending);
 
-  // 2. Piezas > $100 USD (Rango === ">100 USD" o usdPending > 100)
+  // 2. Piezas > $100 USD
   const itemsMayor100 = pendientes.filter(r => r.rango.includes(">100") || r.usdPending > 100);
   const usdMayor100 = itemsMayor100.reduce((acc, r) => acc + r.usdPending, 0);
   const usdMayor100Seg = itemsMayor100.filter(r => r.seguimiento.toUpperCase() === "SEGUIMIENTO").reduce((acc, r) => acc + r.usdPending, 0);
   const pctMayor100Seg = usdMayor100 > 0 ? ((usdMayor100Seg / usdMayor100) * 100).toFixed(1) : "0.0";
   const desgloseMayor100 = agruparSuma(itemsMayor100, r => r.analisisNorm, r => r.usdPending);
 
-  // 3. Top 5 Agings con mayor impacto pendiente
+  // 3. Top Agings con mayor impacto pendiente
   const mapAging = {};
   for (const r of pendientes) {
     if (r.agingStr !== "") mapAging[r.agingStr] = (mapAging[r.agingStr] || 0) + r.usdPending;
   }
   const topAgings = Object.entries(mapAging).sort((a, b) => b[1] - a[1]).slice(0, 6);
 
-  // 4. Desglose general de todos los análisis pendientes
+  // 4. Desglose general por Análisis
   const desgloseGeneral = agruparSuma(pendientes, r => r.analisisNorm, r => r.usdPending);
 
-  // Periodos activos para el asunto del correo
+  // Capturar imágenes de las gráficas actuales del tablero
+  const imgAging = capturarGraficaParaCorreo("chartAging", "Aging — Impacto USD Pending ($)");
+  const imgAnalisis = capturarGraficaParaCorreo("chartAnalisis", "Análisis (USD Pending)");
+  const imgRango = capturarGraficaParaCorreo("chartRango", "Rango USD (USD Pending)");
+  const imgHV = capturarGraficaParaCorreo("chartHV", "Categoría HV (USD Pending)");
+  const imgProxPago = capturarGraficaParaCorreo("chartProximoPago", "Próximo a Pago (USD Pending)");
+  const imgDetalleAging = capturarGraficaParaCorreo("chartDetalleAging", "Detalle Aging por Tipo de Análisis");
+  const imgImpactoSem = capturarGraficaParaCorreo("chartImpactoSemana", "Impacto USD Inicial por Semana");
+
   const periodosActivos = estadoFiltros.semanaLost.size > 0
     ? [...estadoFiltros.semanaLost].join(", ")
     : "Acumulado General";
 
   const htmlCorreo = `
-    <p style="margin:0 0 14px 0;">¡Buen día, equipo!</p>
-    <p style="margin:0 0 18px 0;">
-      Les comparto el análisis detallado actualizado sobre la generación de <strong>LOST</strong> en MXRC03 (${periodosActivos}), el cual asciende a un <strong>monto total pendiente de ${fmtCorreoUSD(totalUsdPend)}</strong>.
-    </p>
+    <div style="font-family: Arial, Helvetica, sans-serif; color: #1E293B; max-width: 780px; line-height: 1.6;">
+      
+      <!-- BANNER EJECUTIVO -->
+      <div style="background:#1B365D; color:#FFFFFF; padding:16px 20px; border-radius:8px; border-bottom:4px solid #FFE600; margin-bottom:18px;">
+        <div style="font-size:11px; text-transform:uppercase; letter-spacing:1px; color:#FFE600; font-weight:bold;">Loss Prevention • Receiving Center MXRC03</div>
+        <div style="font-size:19px; font-weight:bold; margin-top:2px;">Reporte Ejecutivo: Pending Lost MWH (${periodosActivos})</div>
+      </div>
 
-    <p style="margin:0 0 12px 0; font-weight:bold; color:#0F172A;">Clasificaciones</p>
+      <p style="margin:0 0 12px 0; font-size:14px;">¡Buen día, equipo!</p>
+      <p style="margin:0 0 16px 0; font-size:14px;">
+        Les comparto el <strong>análisis detallado actualizado</strong> sobre la generación de <strong>LOST</strong> en los agings con mayor impacto en <strong>MXRC03</strong>, el cual asciende a un <strong>monto total pendiente de <em>${fmtCorreoUSD(totalUsdPend)}</em></strong> (equivalente a <em>${totalPzsPend.toLocaleString("es-MX")} piezas pendientes</em>).
+      </p>
 
-    <div style="margin-bottom:18px;">
-      <div style="font-size:15px; font-weight:bold; color:#0F172A; margin-bottom:4px;">
-        🚚 1. Piezas de Alto Valor (HV)
+      <!-- GRÁFICA PRINCIPAL: AGING -->
+      <div style="border:1px solid #CBD5E1; border-radius:8px; padding:8px; background:#FFFFFF; margin-bottom:22px; text-align:center;">
+        <img src="${imgAging}" alt="Gráfica Aging" style="width:100%; max-width:740px; height:auto; display:block; margin:0 auto;">
       </div>
-      <div style="font-style:italic; margin-bottom:8px; color:#334155;">
-        Monto acumulado en esta categoría: <strong>${fmtCorreoUSD(usdHV)}</strong> (<u>${pctHVSeg}% en seguimiento</u>)
-      </div>
-      <ul style="margin:0; padding-left:22px;">
-        ${desgloseHV.length > 0
-          ? desgloseHV.map(([an, val]) => `<li style="margin-bottom:4px;"><strong>${an}:</strong> <em>${fmtCorreoUSD(val)}</em> ${obtenerEmojiAnalisis(an)}</li>`).join("")
-          : `<li>Sin monto pendiente en esta categoría.</li>`}
-      </ul>
-    </div>
 
-    <div style="margin-bottom:18px;">
-      <div style="font-size:15px; font-weight:bold; color:#0F172A; margin-bottom:4px;">
-        💰 2. Piezas &gt; $100 USD
+      <!-- SUBTÍTULO GENERAL -->
+      <div style="font-size:18px; font-weight:bold; color:#1B365D; border-bottom:2px solid #E2E8F0; padding-bottom:6px; margin-bottom:16px;">
+        Clasificaciones de Impacto
       </div>
-      <div style="font-style:italic; margin-bottom:8px; color:#334155;">
-        Monto acumulado en esta categoría: <strong>${fmtCorreoUSD(usdMayor100)}</strong> (<u>${pctMayor100Seg}% en seguimiento</u>)
-      </div>
-      <ul style="margin:0; padding-left:22px;">
-        ${desgloseMayor100.length > 0
-          ? desgloseMayor100.map(([an, val]) => `<li style="margin-bottom:4px;"><strong>${an}:</strong> <em>${fmtCorreoUSD(val)}</em> ${obtenerEmojiAnalisis(an)}</li>`).join("")
-          : `<li>Sin monto pendiente en esta categoría.</li>`}
-      </ul>
-    </div>
 
-    <div style="margin-bottom:18px;">
-      <div style="font-size:15px; font-weight:bold; color:#0F172A; margin-bottom:6px;">
-        📈 3. Detalle agings con mayor impacto pendiente
+      <!-- SECCIÓN 1: ALTO VALOR (HV) -->
+      <div style="margin-bottom:22px; background:#F8FAFC; border-left:4px solid #3B82F6; padding:14px 16px; border-radius:0 8px 8px 0;">
+        <div style="font-size:17px; font-weight:bold; color:#0F172A; margin-bottom:6px;">
+          🚚 1. Piezas de Alto Valor (HV)
+        </div>
+        <div style="margin-bottom:10px; color:#334155; font-size:13.5px;">
+          <strong>Monto acumulado</strong> en esta categoría: <strong><em>${fmtCorreoUSD(usdHV)}</em></strong> (<u><em>${pctHVSeg}%</em> en seguimiento activo</u>)
+        </div>
+        <ul style="margin:0; padding-left:22px; font-size:13.5px;">
+          ${desgloseHV.length > 0
+            ? desgloseHV.map(([an, val]) => `<li style="margin-bottom:5px;"><strong>${an}:</strong> <em>${fmtCorreoUSD(val)}</em> ${obtenerEmojiAnalisis(an)}</li>`).join("")
+            : `<li><em>Sin monto pendiente registrado en esta categoría.</em></li>`}
+        </ul>
       </div>
-      <ul style="margin:0; padding-left:22px;">
-        ${topAgings.map(([ag, val]) => `<li style="margin-bottom:4px;"><strong>Aging ${ag} días:</strong> <em>${fmtCorreoUSD(val)}</em></li>`).join("")}
-      </ul>
-    </div>
 
-    <div style="margin-bottom:14px;">
-      <div style="font-size:15px; font-weight:bold; color:#0F172A; margin-bottom:6px;">
-        📊 4. Resumen consolidado por estatus de Análisis
+      <!-- SECCIÓN 2: PIEZAS > $100 USD -->
+      <div style="margin-bottom:22px; background:#F8FAFC; border-left:4px solid #F59E0B; padding:14px 16px; border-radius:0 8px 8px 0;">
+        <div style="font-size:17px; font-weight:bold; color:#0F172A; margin-bottom:6px;">
+          💰 2. Piezas &gt; $100 USD
+        </div>
+        <div style="margin-bottom:10px; color:#334155; font-size:13.5px;">
+          <strong>Monto acumulado</strong> en esta categoría: <strong><em>${fmtCorreoUSD(usdMayor100)}</em></strong> (<u><em>${pctMayor100Seg}%</em> en seguimiento activo</u>)
+        </div>
+        <ul style="margin:0; padding-left:22px; font-size:13.5px;">
+          ${desgloseMayor100.length > 0
+            ? desgloseMayor100.map(([an, val]) => `<li style="margin-bottom:5px;"><strong>${an}:</strong> <em>${fmtCorreoUSD(val)}</em> ${obtenerEmojiAnalisis(an)}</li>`).join("")
+            : `<li><em>Sin monto pendiente registrado en esta categoría.</em></li>`}
+        </ul>
       </div>
-      <table style="border-collapse:collapse; width:100%; max-width:520px; font-size:12.5px; border:1px solid #CBD5E1;">
-        <thead>
-          <tr style="background:#1B365D; color:#FFFFFF;">
-            <th style="padding:7px 10px; text-align:left; border:1px solid #CBD5E1;">Tipo de Análisis</th>
-            <th style="padding:7px 10px; text-align:right; border:1px solid #CBD5E1;">USD Pending</th>
-            <th style="padding:7px 10px; text-align:right; border:1px solid #CBD5E1;">% Participación</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${desgloseGeneral.map(([an, val]) => {
-            const pct = totalUsdPend > 0 ? ((val / totalUsdPend) * 100).toFixed(1) : "0.0";
-            return `
-              <tr>
-                <td style="padding:6px 10px; border:1px solid #CBD5E1;">${an}</td>
-                <td style="padding:6px 10px; text-align:right; border:1px solid #CBD5E1; font-weight:bold;">${fmtUSD(val)}</td>
-                <td style="padding:6px 10px; text-align:right; border:1px solid #CBD5E1;">${pct}%</td>
-              </tr>
-            `;
-          }).join("")}
-        </tbody>
+
+      <!-- CUADRÍCULA 2x2 DE LAS 4 DONAS -->
+      <table style="width:100%; border-collapse:separate; border-spacing:10px; margin-bottom:22px;">
+        <tr>
+          <td style="width:50%; border:1px solid #CBD5E1; border-radius:8px; padding:6px; background:#FFFFFF;">
+            <img src="${imgAnalisis}" alt="Análisis" style="width:100%; height:auto; display:block;">
+          </td>
+          <td style="width:50%; border:1px solid #CBD5E1; border-radius:8px; padding:6px; background:#FFFFFF;">
+            <img src="${imgRango}" alt="Rango USD" style="width:100%; height:auto; display:block;">
+          </td>
+        </tr>
+        <tr>
+          <td style="width:50%; border:1px solid #CBD5E1; border-radius:8px; padding:6px; background:#FFFFFF;">
+            <img src="${imgHV}" alt="Categoría HV" style="width:100%; height:auto; display:block;">
+          </td>
+          <td style="width:50%; border:1px solid #CBD5E1; border-radius:8px; padding:6px; background:#FFFFFF;">
+            <img src="${imgProxPago}" alt="Próximo a pago" style="width:100%; height:auto; display:block;">
+          </td>
+        </tr>
       </table>
-    </div>
 
-    <p style="margin:16px 0 0 0; color:#475569; font-size:12.5px;">
-      Quedo atento a cualquier duda o comentario.<br>
-      <strong>Saludos cordiales • Loss Prevention MXRC03</strong>
-    </p>
+      <!-- SECCIÓN 3: DETALLE AGINGS -->
+      <div style="margin-bottom:22px;">
+        <div style="font-size:17px; font-weight:bold; color:#1B365D; margin-bottom:8px;">
+          📈 3. Detalle agings con mayor impacto pendiente
+        </div>
+        <ul style="margin:0 0 12px 0; padding-left:22px; font-size:13.5px;">
+          ${topAgings.map(([ag, val]) => `<li style="margin-bottom:4px;"><strong>Aging <em>${ag} días</em>:</strong> <em>${fmtCorreoUSD(val)}</em></li>`).join("")}
+        </ul>
+        <div style="border:1px solid #CBD5E1; border-radius:8px; padding:8px; background:#FFFFFF;">
+          <img src="${imgDetalleAging}" alt="Detalle Aging" style="width:100%; max-width:740px; height:auto; display:block; margin:0 auto;">
+        </div>
+      </div>
+
+      <!-- SECCIÓN 4: GENERACIÓN POR SEMANA Y RESUMEN -->
+      <div style="margin-bottom:22px;">
+        <div style="font-size:17px; font-weight:bold; color:#1B365D; margin-bottom:8px;">
+          📊 4. Detalle de generación por semana y estatus de Análisis
+        </div>
+        <div style="border:1px solid #CBD5E1; border-radius:8px; padding:8px; background:#FFFFFF; margin-bottom:14px;">
+          <img src="${imgImpactoSem}" alt="Impacto por semana" style="width:100%; max-width:740px; height:auto; display:block; margin:0 auto;">
+        </div>
+
+        <table style="border-collapse:collapse; width:100%; font-size:13px; border:1px solid #CBD5E1;">
+          <thead>
+            <tr style="background:#1B365D; color:#FFFFFF;">
+              <th style="padding:8px 12px; text-align:left; border:1px solid #CBD5E1;">Tipo de Análisis</th>
+              <th style="padding:8px 12px; text-align:right; border:1px solid #CBD5E1;">USD Pending</th>
+              <th style="padding:8px 12px; text-align:right; border:1px solid #CBD5E1;">% Participación</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${desgloseGeneral.map(([an, val]) => {
+              const pct = totalUsdPend > 0 ? ((val / totalUsdPend) * 100).toFixed(1) : "0.0";
+              return `
+                <tr>
+                  <td style="padding:7px 12px; border:1px solid #CBD5E1;"><strong>${an}</strong></td>
+                  <td style="padding:7px 12px; text-align:right; border:1px solid #CBD5E1;"><em>${fmtUSD(val)}</em></td>
+                  <td style="padding:7px 12px; text-align:right; border:1px solid #CBD5E1;"><em>${pct}%</em></td>
+                </tr>
+              `;
+            }).join("")}
+          </tbody>
+        </table>
+      </div>
+
+      <p style="margin:18px 0 0 0; color:#475569; font-size:13px;">
+        Quedo atento a cualquier duda o comentario.<br>
+        <strong>Saludos cordiales • Equipo Loss Prevention MXRC03</strong>
+      </p>
+    </div>
   `;
 
   document.getElementById("email-html-render").innerHTML = htmlCorreo;
 
-  // Configurar enlace directo a Gmail con asunto y cuerpo en texto plano como respaldo
   const asunto = encodeURIComponent(`Seguimiento Pending Lost MWH - MXRC03 (${periodosActivos})`);
   const textoPlano = document.getElementById("email-html-render").innerText;
   const cuerpo = encodeURIComponent(textoPlano);
@@ -1600,19 +1684,17 @@ async function copiarReporteCorreo() {
   const btn = document.getElementById("btn-copiar-correo");
 
   try {
-    // Copia tanto en formato HTML enriquecido (negritas, tablas, viñetas) como texto plano
     const htmlBlob = new Blob([contenedor.innerHTML], { type: "text/html" });
     const textBlob = new Blob([contenedor.innerText], { type: "text/plain" });
     const clipboardItem = new ClipboardItem({ "text/html": htmlBlob, "text/plain": textBlob });
     await navigator.clipboard.write([clipboardItem]);
 
-    btn.textContent = "✅ ¡Copiado! Listo para pegar en Gmail (Ctrl + V)";
+    btn.textContent = "✅ ¡Copiado con gráficas y formato! Pega en Gmail (Ctrl + V)";
     btn.style.background = "#10B981";
     setTimeout(() => {
       btn.textContent = "📋 Copiar reporte con formato (Para pegar en Gmail)";
     }, 3500);
   } catch (err) {
-    // Respaldo de selección directa si el navegador restringe ClipboardItem
     const range = document.createRange();
     range.selectNode(contenedor);
     window.getSelection().removeAllRanges();
@@ -1622,14 +1704,3 @@ async function copiarReporteCorreo() {
     btn.textContent = "✅ ¡Copiado al portapapeles!";
   }
 }
-
-function cerrarModal(idModal) {
-  document.getElementById(idModal).style.display = "none";
-}
-
-function cerrarModalSiFondo(e, idModal) {
-  if (e.target.id === idModal) cerrarModal(idModal);
-}
-</script>
-</body>
-</html>
