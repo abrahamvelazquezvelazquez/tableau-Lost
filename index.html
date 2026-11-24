@@ -30,7 +30,6 @@
       padding-bottom: 40px;
     }
 
-    /* TOPBAR CORPORATIVO */
     .topbar {
       background: linear-gradient(90deg, #0F172A 0%, #1E293B 100%);
       border-bottom: 1px solid var(--border-color);
@@ -110,7 +109,6 @@
     }
     .btn-clear:hover { background: #EF4444; border-color: #EF4444; color: #FFFFFF; }
 
-    /* CONTENEDOR Y MULTIFILTROS */
     .container {
       max-width: 1480px;
       margin: 0 auto;
@@ -227,7 +225,6 @@
       font-size: 13px;
     }
 
-    /* GRÁFICAS Y KPIS */
     .top-analytics-grid {
       display: grid;
       grid-template-columns: 1.55fr 1fr;
@@ -307,7 +304,6 @@
 
     .grid-2-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
 
-    /* TABLAS EJECUTIVAS Y ENLACES WMS */
     .table-wrapper {
       overflow-x: auto;
       max-height: 410px;
@@ -364,7 +360,7 @@
     .tote-link { color: #60A5FA; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
     .num-right { text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; white-space: nowrap; }
 
-    /* MODALES (DETALLE TOTE Y REPORTE DE CORREO) */
+    /* MODALES */
     .modal-backdrop {
       display: none;
       position: fixed;
@@ -383,7 +379,7 @@
       border-top: 4px solid var(--accent-yellow);
       border-radius: 14px;
       width: 100%;
-      max-width: 1200px;
+      max-width: 1340px;
       max-height: 90vh;
       display: flex;
       flex-direction: column;
@@ -436,12 +432,20 @@
       text-decoration: none;
       display: inline-block;
     }
-    .badge-status-link:hover {
-      background: var(--accent-yellow);
-      color: #0F172A;
+    .badge-status-link:hover { background: var(--accent-yellow); color: #0F172A; }
+
+    .conciliacion-pill {
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      color: #6EE7B7;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      line-height: 1.4;
+      white-space: pre-line;
+      min-width: 170px;
     }
 
-    /* ESTILOS DEL BORRADOR DE CORREO CORPORATIVO */
     .email-preview-container {
       background: #FFFFFF;
       color: #1E293B;
@@ -529,7 +533,7 @@
 <div id="loading-overlay">
   <div class="spinner-ring"></div>
   <div style="font-weight:700; font-size:14px; color:#F8FAFC;">Sincronizando Pending Lost MWH - MXRC03...</div>
-  <div style="font-size:12px; color:#94A3B8;">Consultando hoja Seguimiento en tiempo real</div>
+  <div style="font-size:12px; color:#94A3B8;" id="loading-subtext">Consultando hoja Seguimiento en tiempo real</div>
 </div>
 
 <header class="topbar">
@@ -542,23 +546,21 @@
   </div>
   <div class="topbar-controls">
     <button class="btn-report" onclick="abrirModalReporte()">✉️ Generar reporte</button>
-    <button class="btn-refresh" onclick="cargarDatos()">🔄 Actualizar Datos</button>
+    <button class="btn-refresh" onclick="cargarDatos(true)">🔄 Actualizar Datos</button>
     <button class="btn-clear" onclick="limpiarTodosLosFiltros()">🗑️ Limpiar Multifiltros</button>
   </div>
 </header>
 
 <main class="container">
 
-  <!-- MULTIFILTROS DESPLEGABLES -->
   <section class="filters-bar" id="filters-container"></section>
 
-  <!-- ETIQUETAS DE FILTROS ACTIVOS -->
   <section class="active-pills-bar" id="active-pills-bar">
     <span class="pills-title">Filtros activos:</span>
     <div id="pills-list" style="display:flex; flex-wrap:wrap; gap:8px;"></div>
   </section>
 
-  <!-- BLOQUE 1: 4 DONAS EN USD PENDING ($) + KPIs + SEGUIMIENTO TOTAL -->
+  <!-- BLOQUE 1: 4 DONAS + KPIs + SEGUIMIENTO TOTAL -->
   <section class="top-analytics-grid">
     <div class="donuts-quad">
       <div class="mini-chart-box">
@@ -567,7 +569,7 @@
             <h3 class="chart-title">Análisis</h3>
             <span class="tag">USD Pending ($)</span>
           </div>
-          <div class="chart-desc">Total <strong>USD Pending ($)</strong> por tipo de <strong>Análisis</strong> (Col. AU)</div>
+          <div class="chart-desc">Total <strong>USD Pending ($)</strong> por tipo de <strong>Análisis</strong></div>
         </div>
         <div class="canvas-wrap-donut"><canvas id="chartAnalisis"></canvas></div>
       </div>
@@ -578,7 +580,7 @@
             <h3 class="chart-title">Rango USD</h3>
             <span class="tag">USD Pending ($)</span>
           </div>
-          <div class="chart-desc">Total <strong>USD Pending ($)</strong> según clasificación de <strong>Rango</strong> (Col. V)</div>
+          <div class="chart-desc">Total <strong>USD Pending ($)</strong> según clasificación de <strong>Rango</strong></div>
         </div>
         <div class="canvas-wrap-donut"><canvas id="chartRango"></canvas></div>
       </div>
@@ -589,7 +591,7 @@
             <h3 class="chart-title">Categoría (HV)</h3>
             <span class="tag">USD Pending ($)</span>
           </div>
-          <div class="chart-desc">Total <strong>USD Pending ($)</strong> únicamente con valores de <strong>HV</strong> (Col. N)</div>
+          <div class="chart-desc">Total <strong>USD Pending ($)</strong> únicamente con valores de <strong>HV</strong></div>
         </div>
         <div class="canvas-wrap-donut"><canvas id="chartHV"></canvas></div>
       </div>
@@ -600,7 +602,7 @@
             <h3 class="chart-title">Próximo a pago</h3>
             <span class="tag">USD Pending ($)</span>
           </div>
-          <div class="chart-desc"><strong>USD Pending ($)</strong> por <strong>Análisis</strong> donde existe <strong>Fecha de pago</strong> (Col. AA)</div>
+          <div class="chart-desc"><strong>USD Pending ($)</strong> por <strong>Análisis</strong> donde existe <strong>Fecha de pago</strong></div>
         </div>
         <div class="canvas-wrap-donut"><canvas id="chartProximoPago"></canvas></div>
       </div>
@@ -611,32 +613,32 @@
         <div class="kpi-card">
           <div class="kpi-label">Pzs losteadas</div>
           <div class="kpi-value" id="kpi-pzs-lost">0</div>
-          <div class="kpi-sub">Suma Qty inicial (Col. L)</div>
+          <div class="kpi-sub">Suma Qty inicial</div>
         </div>
         <div class="kpi-card">
           <div class="kpi-label">Total losteado</div>
           <div class="kpi-value" id="kpi-usd-lost">$0</div>
-          <div class="kpi-sub">Suma USD Inicial (Col. Q)</div>
+          <div class="kpi-sub">Suma USD Inicial</div>
         </div>
         <div class="kpi-card amber">
           <div class="kpi-label">Pzs pendientes</div>
           <div class="kpi-value" id="kpi-pzs-pend">0</div>
-          <div class="kpi-sub">Suma Qty pending (Col. Y)</div>
+          <div class="kpi-sub">Suma Qty pending</div>
         </div>
         <div class="kpi-card amber">
           <div class="kpi-label">USD pendiente</div>
           <div class="kpi-value" id="kpi-usd-pend">$0</div>
-          <div class="kpi-sub">Suma USD Pending (Col. X)</div>
+          <div class="kpi-sub">Suma USD Pending</div>
         </div>
         <div class="kpi-card emerald">
           <div class="kpi-label">Pzs seguimiento</div>
           <div class="kpi-value" id="kpi-pzs-seg">0</div>
-          <div class="kpi-sub">Qty pending donde Col. AP = SEGUIMIENTO</div>
+          <div class="kpi-sub">Qty pending con SEGUIMIENTO</div>
         </div>
         <div class="kpi-card emerald">
           <div class="kpi-label">USD seguimiento</div>
           <div class="kpi-value" id="kpi-usd-seg">$0</div>
-          <div class="kpi-sub">USD Pending donde Col. AP = SEGUIMIENTO</div>
+          <div class="kpi-sub">USD Pending con SEGUIMIENTO</div>
         </div>
       </div>
 
@@ -646,7 +648,7 @@
             <h3 class="chart-title">Seguimiento total</h3>
             <span class="tag">USD Pending ($)</span>
           </div>
-          <div class="chart-desc">Total <strong>USD Pending ($)</strong> entre <strong>SEGUIMIENTO</strong> y <strong>SIN SEGUIMIENTO</strong> (Col. AP)</div>
+          <div class="chart-desc">Total <strong>USD Pending ($)</strong> entre <strong>SEGUIMIENTO</strong> y <strong>SIN SEGUIMIENTO</strong></div>
         </div>
         <div class="canvas-wrap-donut" style="height:140px;"><canvas id="chartSeguimientoTotal"></canvas></div>
       </div>
@@ -661,7 +663,7 @@
           <h3 class="chart-title">Aging (Días de antigüedad)</h3>
           <span class="tag">USD Pending ($)</span>
         </div>
-        <div class="chart-desc">Suma de <strong>USD Pending ($)</strong> (Col. X) por días de <strong>Aging</strong> (Col. C)</div>
+        <div class="chart-desc">Suma de <strong>USD Pending ($)</strong> por días de <strong>Aging</strong></div>
       </div>
       <div class="canvas-wrap-bar"><canvas id="chartAging"></canvas></div>
     </div>
@@ -672,18 +674,18 @@
           <h3 class="chart-title">Próximas a pago por Semana Pago</h3>
           <span class="tag">USD Pending ($)</span>
         </div>
-        <div class="chart-desc">Suma de <strong>USD Pending ($)</strong> por <strong>Semana Pago</strong> (Col. AB) desglosado por <strong>Análisis</strong> (Col. AU)</div>
+        <div class="chart-desc">Suma de <strong>USD Pending ($)</strong> por <strong>Semana Pago</strong> desglosado por <strong>Análisis</strong></div>
       </div>
       <div class="canvas-wrap-bar"><canvas id="chartProximasSemana"></canvas></div>
     </div>
   </section>
 
-  <!-- BLOQUE 3: TABLA SEGUIMIENTO RELEVANTE CON ENLACES DIRECTOS A WMS -->
+  <!-- BLOQUE 3: TABLA SEGUIMIENTO RELEVANTE (SIN CONCILIACIÓN GLOBAL EN PANTALLA PRINCIPAL) -->
   <section class="card-full">
     <div class="chart-header">
       <div class="chart-title-row">
         <h3 class="chart-title">Seguimiento relevante (Top 25 Issues con mayor impacto pendiente)</h3>
-        <span class="tag" style="color:#FFE600;">Clic en SKU / Ubicación abre WMS • Clic en otra columna abre detalle</span>
+        <span class="tag" style="color:#FFE600;">Clic en SKU / Ubicación abre WMS • Clic en fila abre detalle con Conciliación Global</span>
       </div>
       <div class="chart-desc">Ordenado de mayor a menor <strong>USD Pending ($)</strong> • Enlaces directos a reportes de WMS AdminML</div>
     </div>
@@ -717,7 +719,7 @@
           <h3 class="chart-title">Impacto USD por semana</h3>
           <span class="tag">USD Inicial ($)</span>
         </div>
-        <div class="chart-desc">Suma de <strong>USD Inicial ($)</strong> (Col. Q) por <strong>Semana Lost</strong> (Col. A)</div>
+        <div class="chart-desc">Suma de <strong>USD Inicial ($)</strong> por <strong>Semana Lost</strong></div>
       </div>
       <div class="canvas-wrap-bar"><canvas id="chartImpactoSemana"></canvas></div>
     </div>
@@ -728,7 +730,7 @@
           <h3 class="chart-title">MU's Losteados por semana</h3>
           <span class="tag">Conteo de MUs</span>
         </div>
-        <div class="chart-desc">Conteo de <strong>Ubicaciones únicas</strong> (Col. K) por <strong>Semana Lost</strong> (Col. A)</div>
+        <div class="chart-desc">Conteo de <strong>Ubicaciones únicas</strong> por <strong>Semana Lost</strong></div>
       </div>
       <div class="canvas-wrap-bar"><canvas id="chartMusSemana"></canvas></div>
     </div>
@@ -741,7 +743,7 @@
         <h3 class="chart-title">Detalle Aging por Tipo de Análisis</h3>
         <span class="tag">USD Pending ($)</span>
       </div>
-      <div class="chart-desc">Suma de <strong>USD Pending ($)</strong> (Col. X) por días de <strong>Aging</strong> (Col. C) apilado por <strong>Análisis</strong> (Col. AU)</div>
+      <div class="chart-desc">Suma de <strong>USD Pending ($)</strong> por días de <strong>Aging</strong> apilado por <strong>Análisis</strong></div>
     </div>
     <div class="canvas-wrap-bar" style="height:270px;"><canvas id="chartDetalleAging"></canvas></div>
   </section>
@@ -754,7 +756,7 @@
           <h3 class="chart-title">Totes perdidos</h3>
           <span class="tag" style="color:#FFE600;">Clic en un Tote para ver detalle</span>
         </div>
-        <div class="chart-desc">Ubicaciones con <strong>Análisis</strong> (Col. AU) vacío o igual a <strong>Seguimiento CCM</strong></div>
+        <div class="chart-desc">Ubicaciones con <strong>Análisis</strong> vacío o igual a <strong>Seguimiento CCM</strong></div>
       </div>
       <div class="table-wrapper">
         <table>
@@ -777,7 +779,7 @@
           <h3 class="chart-title">Totes localizados / con inconsistencia</h3>
           <span class="tag" style="color:#FFE600;">Clic en un Tote para ver detalle</span>
         </div>
-        <div class="chart-desc">Ubicaciones con cualquier otro <strong>Análisis</strong> (Col. AU) distinto a vacío o Seguimiento CCM</div>
+        <div class="chart-desc">Ubicaciones con cualquier otro <strong>Análisis</strong> distinto a vacío o Seguimiento CCM</div>
       </div>
       <div class="table-wrapper">
         <table>
@@ -797,15 +799,13 @@
 
 </main>
 
-<!-- =========================================================
-     MODAL 1: DETALLE DE TOTE (CON ENLACES INBOUND E INCONSISTENCIAS)
-     ========================================================= -->
+<!-- MODAL 1: DETALLE DE TOTE (INCLUYE CONCILIACIÓN GLOBAL) -->
 <div id="modal-tote" class="modal-backdrop" onclick="cerrarModalSiFondo(event, 'modal-tote')">
   <div class="modal-card">
     <div class="modal-header">
       <div>
         <h2 id="modal-tote-titulo">Detalle de Ubicación: ---</h2>
-        <p id="modal-tote-subtitulo">Clic en Inbound o Status (Pendiente) para abrir directamente en WMS AdminML</p>
+        <p id="modal-tote-subtitulo">Incluye Conciliación Global y enlaces directos a Inbound, SKU e Inconsistencias en WMS</p>
       </div>
       <button class="btn-close-modal" onclick="cerrarModal('modal-tote')">✕ Cerrar</button>
     </div>
@@ -816,7 +816,7 @@
       <div class="m-stat"><span>USD Pending Total</span><strong id="m-usd-pend" style="color:#FFE600;">$0.00</strong></div>
     </div>
     <div class="modal-body">
-      <div class="table-wrapper" style="max-height:52vh;">
+      <div class="table-wrapper" style="max-height:54vh;">
         <table>
           <thead>
             <tr>
@@ -829,8 +829,9 @@
               <th class="num-right">Qty Ini</th>
               <th class="num-right">Qty Pend</th>
               <th class="num-right">USD Pend</th>
+              <th>Conciliación Global</th>
               <th>Fecha Pago</th>
-              <th>Status (Inconsistencias)</th>
+              <th>Status (WMS)</th>
               <th>Análisis</th>
               <th>Comentarios</th>
             </tr>
@@ -842,15 +843,13 @@
   </div>
 </div>
 
-<!-- =========================================================
-     MODAL 2: BORRADOR DE REPORTE CORPORATIVO PARA CORREO
-     ========================================================= -->
+<!-- MODAL 2: BORRADOR DE REPORTE CORPORATIVO -->
 <div id="modal-reporte" class="modal-backdrop" onclick="cerrarModalSiFondo(event, 'modal-reporte')">
-  <div class="modal-card" style="max-width: 900px;">
+  <div class="modal-card" style="max-width: 920px;">
     <div class="modal-header">
       <div>
         <h2>✉️ Borrador de Reporte Ejecutivo — Loss Prevention MXRC03</h2>
-        <p>Generado automáticamente con los datos, gráficas y filtros activos del tablero</p>
+        <p>Gráficas 3D corporativas, subtítulos destacados, palabras clave en negrita y cifras en cursiva</p>
       </div>
       <button class="btn-close-modal" onclick="cerrarModal('modal-reporte')">✕ Cerrar</button>
     </div>
@@ -858,13 +857,13 @@
     <div class="email-actions-bar">
       <div style="display:flex; gap:10px; flex-wrap:wrap;">
         <button type="button" class="btn-copy-rich" id="btn-copiar-correo" onclick="copiarReporteCorreo()">
-          📋 Copiar reporte con gráficas y formato (Para pegar en Gmail)
+          📋 Copiar reporte con gráficas 3D y formato (Para Gmail)
         </button>
         <a id="link-abrir-gmail" href="#" target="_blank" class="btn-open-gmail">
           🚀 Abrir redacción en Gmail
         </a>
       </div>
-      <span style="font-size:11.5px; color:#94A3B8;">Tip: Pega con <strong>Ctrl + V</strong> en Gmail para conservar gráficas, negritas y cursivas</span>
+      <span style="font-size:11.5px; color:#94A3B8;">Tip: Pega con <strong>Ctrl + V</strong> en Gmail</span>
     </div>
 
     <div class="modal-body" style="background:#0F172A;">
@@ -875,15 +874,16 @@
 
 <script>
 const DASHBOARD_API_URL = "https://pending-lost-api.abraham-velazquezvelazquez.workers.dev";
+const LOCAL_CACHE_KEY = "lp_pending_lost_cache_v3";
 
 const CONFIG_FILTROS = [
-  { campo: "semanaLost",        etiqueta: "Semana Lost (Col. A)" },
-  { campo: "hv",                etiqueta: "Categoría HV (Col. N)" },
-  { campo: "rango",             etiqueta: "Rango USD (Col. V)" },
-  { campo: "analisis",          etiqueta: "Análisis (Col. AU)" },
-  { campo: "semanaPago",        etiqueta: "Semana Pago (Col. AB)" },
-  { campo: "semanaSeguimiento", etiqueta: "Sem. Seguimiento (Col. AQ)" },
-  { campo: "seguimiento",       etiqueta: "Seguimiento (Col. AP)" }
+  { campo: "semanaLost",        etiqueta: "Semana Lost" },
+  { campo: "hv",                etiqueta: "Categoría HV" },
+  { campo: "rango",             etiqueta: "Rango USD" },
+  { campo: "analisis",          etiqueta: "Análisis" },
+  { campo: "semanaPago",        etiqueta: "Semana Pago" },
+  { campo: "semanaSeguimiento", etiqueta: "Sem. Seguimiento" },
+  { campo: "seguimiento",       etiqueta: "Seguimiento" }
 ];
 
 let rawRegistros = [];
@@ -912,9 +912,6 @@ Chart.defaults.font.size = 11;
 
 const fmtUSD = (val) => "$" + Number(val || 0).toLocaleString("es-MX", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " USD";
 
-/* =========================================================================
-   GENERADORES DE ENLACES DINÁMICOS A WMS ADMINML
-   ========================================================================= */
 function urlWmsSku(sku) {
   return `https://wms.adminml.com/reports/skus/${encodeURIComponent(sku)}`;
 }
@@ -931,9 +928,52 @@ function urlWmsInconsistencies(sku, ubicacion) {
   return `https://wms.adminml.com/reports/inconsistencies?inventory_id=${encodeURIComponent(sku)}&site_id=MLM&date_to=2027-01-01T05%3A59%3A00.000%2B00%3A00&date_from=2026-01-01T06%3A00%3A00.000%2B00%3A00&sort=date_last_updated_desc&address_id=${encodeURIComponent(ubicacion)}`;
 }
 
+function hidratarRegistros(lista) {
+  if (!Array.isArray(lista) || lista.length === 0) return [];
+  if (Array.isArray(lista[0])) {
+    return lista.map(r => {
+      const analisis = r[21] || "";
+      const agingRaw = r[2] || "";
+      return {
+        semanaLost: r[0] || "",
+        aging: Number(r[1]) || 0,
+        agingRaw,
+        issue: r[3] || "",
+        inbound: r[4] || "",
+        sku: r[5] || "",
+        titulo: r[6] || "",
+        ubicacion: r[7] || "",
+        qtyInicial: Number(r[8]) || 0,
+        hv: r[9] || "",
+        usdInicial: Number(r[10]) || 0,
+        rango: r[11] || "",
+        usdPending: Number(r[12]) || 0,
+        qtyPending: Number(r[13]) || 0,
+        status: r[14] || "",
+        fechaPago: r[15] || "",
+        semanaPago: r[16] || "",
+        piezasIndebidas: Number(r[17]) || 0,
+        seguimiento: r[18] || "",
+        semanaSeguimiento: r[19] || "",
+        comentarios: r[20] || "",
+        analisis,
+        conciliacionGlobal: r[22] || "",
+        analisisNorm: analisis || "Sin análisis",
+        agingStr: agingRaw !== "" ? String(Math.round(Number(r[1]) || 0)) : ""
+      };
+    });
+  }
+  return lista.map(r => ({
+    ...r,
+    conciliacionGlobal: r.conciliacionGlobal || "",
+    analisisNorm: r.analisis || "Sin análisis",
+    agingStr: r.agingRaw !== "" ? String(Math.round(r.aging)) : ""
+  }));
+}
+
 window.addEventListener("DOMContentLoaded", () => {
   construirContenedoresMultifiltro();
-  cargarDatos();
+  cargarDatos(false);
 
   document.addEventListener("click", (e) => {
     if (!e.target.closest(".filter-item")) {
@@ -942,29 +982,64 @@ window.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-async function cargarDatos() {
+async function cargarDatos(forzarRefresh = false) {
   const overlay = document.getElementById("loading-overlay");
-  overlay.style.display = "flex";
+  const subtext = document.getElementById("loading-subtext");
+
+  const cachedRaw = localStorage.getItem(LOCAL_CACHE_KEY);
+  let yaMostroCache = false;
+  if (!forzarRefresh && cachedRaw) {
+    try {
+      const parsed = JSON.parse(cachedRaw);
+      if (parsed && parsed.registros && parsed.registros.length > 0) {
+        rawRegistros = hidratarRegistros(parsed.registros);
+        poblarOpcionesMultifiltros();
+        aplicarFiltros();
+        overlay.style.display = "none";
+        yaMostroCache = true;
+        document.getElementById("last-sync").textContent =
+          `Vista rápida (${rawRegistros.length.toLocaleString("es-MX")} registros) • Sincronizando actualizaciones...`;
+      }
+    } catch (_) {}
+  }
+
+  if (!yaMostroCache) {
+    overlay.style.display = "flex";
+    subtext.textContent = "Descargando registros desde Google Sheets...";
+  }
+
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 20000);
 
   try {
-    const resp = await fetch(DASHBOARD_API_URL);
+    const endpoint = forzarRefresh ? `${DASHBOARD_API_URL}?refresh=1` : DASHBOARD_API_URL;
+    const resp = await fetch(endpoint, { signal: controller.signal });
+    clearTimeout(timeoutId);
+
     const data = await resp.json();
     if (data.error) throw new Error(data.error);
 
-    rawRegistros = (data.registros || []).map(r => ({
-      ...r,
-      analisisNorm: r.analisis || "Sin análisis",
-      agingStr: r.agingRaw !== "" ? String(Math.round(r.aging)) : ""
-    }));
+    if (data.registros && data.registros.length > 0) {
+      try { localStorage.setItem(LOCAL_CACHE_KEY, JSON.stringify({ registros: data.registros })); } catch (_) {}
+      rawRegistros = hidratarRegistros(data.registros);
+      poblarOpcionesMultifiltros();
+      aplicarFiltros();
+    }
 
     const hora = new Date().toLocaleTimeString("es-MX", { hour: "2-digit", minute: "2-digit" });
     document.getElementById("last-sync").textContent =
       `Conectado a hoja Seguimiento • ${rawRegistros.length.toLocaleString("es-MX")} registros • Actualizado a las ${hora}`;
 
-    poblarOpcionesMultifiltros();
-    aplicarFiltros();
   } catch (err) {
-    alert("❌ Error al cargar datos: " + err.message);
+    clearTimeout(timeoutId);
+    const msg = err.name === "AbortError"
+      ? "La conexión tardó más de 20 segundos. Presiona 'Actualizar Datos' para reintentar."
+      : err.message;
+    if (!yaMostroCache) {
+      alert("⚠️ Aviso de carga: " + msg);
+    } else {
+      document.getElementById("last-sync").textContent = `Mostrando caché local (${rawRegistros.length.toLocaleString("es-MX")} registros)`;
+    }
   } finally {
     overlay.style.display = "none";
   }
@@ -1142,7 +1217,7 @@ function actualizarKPIs() {
 }
 
 /* =========================================================================
-   GRÁFICAS (EN USD PENDING $)
+   GRÁFICAS
    ========================================================================= */
 function agruparSuma(lista, keyFn, valFn) {
   const map = {};
@@ -1172,6 +1247,7 @@ function crearDonaUSD(canvasId, etiquetas, valores, campoFiltro, colores = PALET
     options: {
       responsive: true,
       maintainAspectRatio: false,
+      animation: false,
       cutout: "58%",
       onClick: (event, elements) => {
         if (elements.length > 0 && campoFiltro) {
@@ -1204,6 +1280,7 @@ function crearBarrasInteractivas(canvasId, etiquetas, datasets, campoFiltroX, ap
     options: {
       responsive: true,
       maintainAspectRatio: false,
+      animation: false,
       scales: {
         x: { stacked: apilado },
         y: {
@@ -1258,29 +1335,43 @@ function renderizarTodasLasGraficas() {
   crearDonaUSD("chartSeguimientoTotal", g5.map(d => d[0]), g5.map(d => d[1]), "seguimiento", ["#F59E0B", "#3B82F6", "#64748B"]);
 
   const mapAging = {};
+  const mapAgingPorAnalisis = {};
+  const setAnalisisPending = new Set();
+
   for (const r of soloConPending) {
-    if (r.agingStr !== "") mapAging[r.agingStr] = (mapAging[r.agingStr] || 0) + r.usdPending;
+    if (r.agingStr === "") continue;
+    mapAging[r.agingStr] = (mapAging[r.agingStr] || 0) + r.usdPending;
+    setAnalisisPending.add(r.analisisNorm);
+    if (!mapAgingPorAnalisis[r.analisisNorm]) mapAgingPorAnalisis[r.analisisNorm] = {};
+    mapAgingPorAnalisis[r.analisisNorm][r.agingStr] = (mapAgingPorAnalisis[r.analisisNorm][r.agingStr] || 0) + r.usdPending;
   }
   const g6 = Object.entries(mapAging).sort((a, b) => Number(a[0]) - Number(b[0]));
+  const agingsUnicos = g6.map(d => d[0]);
+
   crearBarrasInteractivas(
     "chartAging",
-    g6.map(d => d[0]),
+    agingsUnicos,
     [{ label: "USD Pending", data: g6.map(d => d[1]), backgroundColor: "#F59E0B", borderRadius: 4 }],
     "aging",
     false,
     true
   );
 
-  const conSemanaPago = soloConPending.filter(r => r.semanaPago !== "");
-  const semanasPago = [...new Set(conSemanaPago.map(r => r.semanaPago))].sort();
-  const tiposAnalisisPago = [...new Set(conSemanaPago.map(r => r.analisisNorm))];
-  const ds7 = tiposAnalisisPago.map((an, idx) => ({
+  const setSemanasPago = new Set();
+  const mapSemPagoAnalisis = {};
+  const setAnalisisPago = new Set();
+  for (const r of soloConPending) {
+    if (!r.semanaPago) continue;
+    setSemanasPago.add(r.semanaPago);
+    setAnalisisPago.add(r.analisisNorm);
+    if (!mapSemPagoAnalisis[r.analisisNorm]) mapSemPagoAnalisis[r.analisisNorm] = {};
+    mapSemPagoAnalisis[r.analisisNorm][r.semanaPago] = (mapSemPagoAnalisis[r.analisisNorm][r.semanaPago] || 0) + r.usdPending;
+  }
+  const semanasPago = [...setSemanasPago].sort();
+  const ds7 = [...setAnalisisPago].map((an, idx) => ({
     label: an,
     backgroundColor: PALETA_CORP[idx % PALETA_CORP.length],
-    data: semanasPago.map(sem =>
-      conSemanaPago.filter(r => r.semanaPago === sem && r.analisisNorm === an)
-                   .reduce((acc, cur) => acc + cur.usdPending, 0)
-    )
+    data: semanasPago.map(sem => (mapSemPagoAnalisis[an] && mapSemPagoAnalisis[an][sem]) || 0)
   }));
   crearBarrasInteractivas("chartProximasSemana", semanasPago, ds7, "semanaPago", true, true);
 
@@ -1312,21 +1403,16 @@ function renderizarTodasLasGraficas() {
     false
   );
 
-  const agingsUnicos = g6.map(d => d[0]);
-  const analisisTodos = [...new Set(soloConPending.map(r => r.analisisNorm))];
-  const ds10 = analisisTodos.map((an, idx) => ({
+  const ds10 = [...setAnalisisPending].map((an, idx) => ({
     label: an,
     backgroundColor: PALETA_CORP[idx % PALETA_CORP.length],
-    data: agingsUnicos.map(ag =>
-      soloConPending.filter(r => r.agingStr === ag && r.analisisNorm === an)
-                    .reduce((acc, cur) => acc + cur.usdPending, 0)
-    )
+    data: agingsUnicos.map(ag => (mapAgingPorAnalisis[an] && mapAgingPorAnalisis[an][ag]) || 0)
   }));
   crearBarrasInteractivas("chartDetalleAging", agingsUnicos, ds10, "aging", true, true);
 }
 
 /* =========================================================================
-   TABLAS CON ENLACES DIRECTOS A WMS Y DETALLE DE TOTE
+   TABLAS PRINCIPALES Y MODAL DETALLE DE TOTE (CON CONCILIACIÓN GLOBAL)
    ========================================================================= */
 function renderizarTablas() {
   const topRelevante = [...registrosFiltrados]
@@ -1404,9 +1490,6 @@ function renderizarTablas() {
   }).join("");
 }
 
-/* =========================================================================
-   MODAL DETALLE DE TOTE (CON LINKS A INBOUND E INCONSISTENCIAS)
-   ========================================================================= */
 function abrirDetalleTote(ubicacion) {
   if (!ubicacion) return;
   const items = registrosFiltrados.filter(r => r.ubicacion === ubicacion);
@@ -1419,7 +1502,7 @@ function abrirDetalleTote(ubicacion) {
   }
 
   document.getElementById("modal-tote-titulo").textContent = `Detalle de Ubicación (Tote): ${ubicacion}`;
-  document.getElementById("modal-tote-subtitulo").textContent = `Mostrando ${items.length} registro(s) • Clic en Inbound o Status para abrir WMS`;
+  document.getElementById("modal-tote-subtitulo").textContent = `Mostrando ${items.length} registro(s) • Incluye Conciliación Global y enlaces directos a WMS`;
   document.getElementById("m-total-lineas").textContent = items.length;
   document.getElementById("m-qty-ini").textContent = sumIni.toLocaleString("es-MX");
   document.getElementById("m-qty-pend").textContent = sumPend.toLocaleString("es-MX");
@@ -1435,6 +1518,9 @@ function abrirDetalleTote(ubicacion) {
     const linkStatus = it.status
       ? `<a href="${urlWmsInconsistencies(it.sku, it.ubicacion)}" target="_blank" rel="noopener" class="badge-status-link" title="Abrir Inconsistencias en WMS">${it.status}</a>`
       : "—";
+    const conciliacionHtml = it.conciliacionGlobal
+      ? `<div class="conciliacion-pill">${it.conciliacionGlobal}</div>`
+      : "—";
 
     return `
       <tr>
@@ -1447,6 +1533,7 @@ function abrirDetalleTote(ubicacion) {
         <td class="num-right">${it.qtyInicial.toLocaleString("es-MX")}</td>
         <td class="num-right">${it.qtyPending.toLocaleString("es-MX")}</td>
         <td class="num-right" style="color:#FFE600;">$${it.usdPending.toLocaleString("es-MX", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+        <td>${conciliacionHtml}</td>
         <td>${it.fechaPago || "—"}</td>
         <td>${linkStatus}</td>
         <td>${it.analisisNorm}</td>
@@ -1476,7 +1563,6 @@ function obtenerEmojiAnalisis(nombre) {
   return "📌";
 }
 
-// Plugin de Chart.js para efecto biselado y profundidad 3D corporativa en barras y donas
 const pluginEfecto3D = {
   id: "efecto3DCorporativo",
   beforeDatasetsDraw(chart) {
@@ -1491,7 +1577,6 @@ const pluginEfecto3D = {
     const { ctx, config } = chart;
     ctx.restore();
 
-    // Añadir biselado 3D lateral/superior y etiquetas de valor en barras
     if (config.type === "bar") {
       chart.data.datasets.forEach((dataset, dsIndex) => {
         const meta = chart.getDatasetMeta(dsIndex);
@@ -1508,7 +1593,6 @@ const pluginEfecto3D = {
           const depth = Math.min(6, width * 0.22);
           ctx.save();
 
-          // Cara lateral derecha 3D (sombra oscura)
           ctx.fillStyle = "rgba(15, 23, 42, 0.25)";
           ctx.beginPath();
           ctx.moveTo(x + width / 2, y);
@@ -1518,7 +1602,6 @@ const pluginEfecto3D = {
           ctx.closePath();
           ctx.fill();
 
-          // Cara superior 3D (brillo biselado)
           ctx.fillStyle = "rgba(255, 255, 255, 0.32)";
           ctx.beginPath();
           ctx.moveTo(x - width / 2, y);
@@ -1528,7 +1611,6 @@ const pluginEfecto3D = {
           ctx.closePath();
           ctx.fill();
 
-          // Etiqueta numérica sobre la barra (solo en barras simples o en el tope)
           if (!chart.options.scales.x.stacked) {
             ctx.fillStyle = "#1E293B";
             ctx.font = "bold 9.5px Arial, sans-serif";
@@ -1544,14 +1626,12 @@ const pluginEfecto3D = {
   }
 };
 
-// Genera una gráfica 3D de alta resolución con TODOS los ejes X visibles para el correo
-async function renderizarGrafica3DCorreo({ tipo, titulo, etiquetas, datasets, apilado = false, ancho = 940, alto = 320 }) {
+function renderizarGrafica3DCorreo({ tipo, titulo, etiquetas, datasets, apilado = false, ancho = 940, alto = 320 }) {
   const tempCanvas = document.createElement("canvas");
   tempCanvas.width = ancho;
   tempCanvas.height = alto;
   const ctx = tempCanvas.getContext("2d");
 
-  // Fondo blanco puro para el render
   const bgPlugin = {
     id: "whiteBg",
     beforeDraw: (c) => {
@@ -1563,13 +1643,9 @@ async function renderizarGrafica3DCorreo({ tipo, titulo, etiquetas, datasets, ap
     }
   };
 
-  // Aplicar degradados 3D a las barras
-  const datasetsConGradiente = datasets.map((ds, i) => {
+  const datasetsConEstilo = datasets.map((ds, i) => {
     if (tipo === "bar") {
       const baseColor = Array.isArray(ds.backgroundColor) ? ds.backgroundColor[0] : (ds.backgroundColor || PALETA_CORP[i % PALETA_CORP.length]);
-      const grad = ctx.createLinearGradient(0, 30, 0, alto - 40);
-      grad.addColorStop(0, baseColor);
-      grad.addColorStop(1, "#0F172A");
       return {
         ...ds,
         backgroundColor: baseColor,
@@ -1584,7 +1660,7 @@ async function renderizarGrafica3DCorreo({ tipo, titulo, etiquetas, datasets, ap
 
   const config = {
     type: tipo,
-    data: { labels: etiquetas, datasets: datasetsConGradiente },
+    data: { labels: etiquetas, datasets: datasetsConEstilo },
     plugins: [bgPlugin, pluginEfecto3D],
     options: {
       responsive: false,
@@ -1615,7 +1691,7 @@ async function renderizarGrafica3DCorreo({ tipo, titulo, etiquetas, datasets, ap
           grid: { display: false },
           ticks: {
             color: "#0F172A",
-            autoSkip: false, // FUERZA A MOSTRAR TODOS LOS DÍAS Y SEMANAS SIN OMITIR NINGUNO
+            autoSkip: false,
             maxRotation: 50,
             minRotation: 35,
             font: { size: 10.5, weight: "bold", family: "Arial, sans-serif" }
@@ -1634,9 +1710,7 @@ async function renderizarGrafica3DCorreo({ tipo, titulo, etiquetas, datasets, ap
     }
   };
 
-  if (tipo === "doughnut") {
-    config.options.cutout = "52%";
-  }
+  if (tipo === "doughnut") config.options.cutout = "52%";
 
   const tempChart = new Chart(ctx, config);
   const dataUrl = tempCanvas.toDataURL("image/png");
@@ -1644,38 +1718,38 @@ async function renderizarGrafica3DCorreo({ tipo, titulo, etiquetas, datasets, ap
   return dataUrl;
 }
 
-async function abrirModalReporte() {
+function abrirModalReporte() {
   const pendientes = registrosFiltrados.filter(r => r.usdPending > 0);
   const totalUsdPend = pendientes.reduce((acc, r) => acc + r.usdPending, 0);
   const totalPzsPend = pendientes.reduce((acc, r) => acc + r.qtyPending, 0);
 
-  // 1. Piezas de Alto Valor (HV === "HV")
   const itemsHV = pendientes.filter(r => r.hv.toUpperCase() === "HV");
   const usdHV = itemsHV.reduce((acc, r) => acc + r.usdPending, 0);
   const usdHVSeg = itemsHV.filter(r => r.seguimiento.toUpperCase() === "SEGUIMIENTO").reduce((acc, r) => acc + r.usdPending, 0);
   const pctHVSeg = usdHV > 0 ? ((usdHVSeg / usdHV) * 100).toFixed(1) : "0.0";
   const desgloseHV = agruparSuma(itemsHV, r => r.analisisNorm, r => r.usdPending);
 
-  // 2. Piezas > $100 USD
   const itemsMayor100 = pendientes.filter(r => r.rango.includes(">100") || r.usdPending > 100);
   const usdMayor100 = itemsMayor100.reduce((acc, r) => acc + r.usdPending, 0);
   const usdMayor100Seg = itemsMayor100.filter(r => r.seguimiento.toUpperCase() === "SEGUIMIENTO").reduce((acc, r) => acc + r.usdPending, 0);
   const pctMayor100Seg = usdMayor100 > 0 ? ((usdMayor100Seg / usdMayor100) * 100).toFixed(1) : "0.0";
   const desgloseMayor100 = agruparSuma(itemsMayor100, r => r.analisisNorm, r => r.usdPending);
 
-  // 3. Agings ordenados
   const mapAging = {};
+  const mapAgingAnalisis = {};
+  const setAn = new Set();
   for (const r of pendientes) {
-    if (r.agingStr !== "") mapAging[r.agingStr] = (mapAging[r.agingStr] || 0) + r.usdPending;
+    if (r.agingStr === "") continue;
+    mapAging[r.agingStr] = (mapAging[r.agingStr] || 0) + r.usdPending;
+    setAn.add(r.analisisNorm);
+    if (!mapAgingAnalisis[r.analisisNorm]) mapAgingAnalisis[r.analisisNorm] = {};
+    mapAgingAnalisis[r.analisisNorm][r.agingStr] = (mapAgingAnalisis[r.analisisNorm][r.agingStr] || 0) + r.usdPending;
   }
   const agingsPorDia = Object.entries(mapAging).sort((a, b) => Number(a[0]) - Number(b[0]));
   const topAgings = Object.entries(mapAging).sort((a, b) => b[1] - a[1]).slice(0, 6);
-
-  // 4. Desglose general por Análisis
   const desgloseGeneral = agruparSuma(pendientes, r => r.analisisNorm, r => r.usdPending);
 
-  // 5. Generar las gráficas 3D dedicadas para el correo (con TODOS los días y semanas visibles)
-  const imgAging3D = await renderizarGrafica3DCorreo({
+  const imgAging3D = renderizarGrafica3DCorreo({
     tipo: "bar",
     titulo: "Aging — Impacto USD Pending ($) por Día de Antigüedad",
     etiquetas: agingsPorDia.map(d => `Día ${d[0]}`),
@@ -1684,18 +1758,17 @@ async function abrirModalReporte() {
     alto: 310
   });
 
-  const gAnalisis = agruparSuma(pendientes, r => r.analisisNorm, r => r.usdPending);
-  const imgAnalisis3D = await renderizarGrafica3DCorreo({
+  const imgAnalisis3D = renderizarGrafica3DCorreo({
     tipo: "doughnut",
     titulo: "Distribución por Tipo de Análisis (USD Pending)",
-    etiquetas: gAnalisis.map(d => `${d[0]} (${fmtCorreoUSD(d[1])})`),
-    datasets: [{ data: gAnalisis.map(d => d[1]), backgroundColor: PALETA_CORP, borderColor: "#FFFFFF", borderWidth: 2 }],
+    etiquetas: desgloseGeneral.map(d => `${d[0]} (${fmtCorreoUSD(d[1])})`),
+    datasets: [{ data: desgloseGeneral.map(d => d[1]), backgroundColor: PALETA_CORP, borderColor: "#FFFFFF", borderWidth: 2 }],
     ancho: 460,
     alto: 250
   });
 
   const gRango = agruparSuma(pendientes, r => r.rango || "Sin rango", r => r.usdPending);
-  const imgRango3D = await renderizarGrafica3DCorreo({
+  const imgRango3D = renderizarGrafica3DCorreo({
     tipo: "doughnut",
     titulo: "Distribución por Rango USD (USD Pending)",
     etiquetas: gRango.map(d => `${d[0]} (${fmtCorreoUSD(d[1])})`),
@@ -1706,7 +1779,7 @@ async function abrirModalReporte() {
 
   const soloConHV = pendientes.filter(r => r.hv !== "" && r.hv !== "-");
   const gHV = agruparSuma(soloConHV, r => r.hv, r => r.usdPending);
-  const imgHV3D = await renderizarGrafica3DCorreo({
+  const imgHV3D = renderizarGrafica3DCorreo({
     tipo: "doughnut",
     titulo: "Categoría HV vs NO HV (USD Pending)",
     etiquetas: gHV.map(d => `${d[0]} (${fmtCorreoUSD(d[1])})`),
@@ -1717,7 +1790,7 @@ async function abrirModalReporte() {
 
   const conFechaPago = pendientes.filter(r => r.fechaPago !== "");
   const gProxPago = agruparSuma(conFechaPago, r => r.analisisNorm, r => r.usdPending);
-  const imgProxPago3D = await renderizarGrafica3DCorreo({
+  const imgProxPago3D = renderizarGrafica3DCorreo({
     tipo: "doughnut",
     titulo: "Próximo a Pago con Fecha Asignada (USD Pending)",
     etiquetas: gProxPago.map(d => `${d[0]} (${fmtCorreoUSD(d[1])})`),
@@ -1726,17 +1799,12 @@ async function abrirModalReporte() {
     alto: 250
   });
 
-  // Detalle Aging apilado por análisis con TODOS los días
-  const analisisTodos = [...new Set(pendientes.map(r => r.analisisNorm))];
-  const dsDetalleAging = analisisTodos.map((an, idx) => ({
+  const dsDetalleAging = [...setAn].map((an, idx) => ({
     label: an,
     backgroundColor: PALETA_CORP[idx % PALETA_CORP.length],
-    data: agingsPorDia.map(ag =>
-      pendientes.filter(r => r.agingStr === ag[0] && r.analisisNorm === an)
-                .reduce((acc, cur) => acc + cur.usdPending, 0)
-    )
+    data: agingsPorDia.map(ag => (mapAgingAnalisis[an] && mapAgingAnalisis[an][ag[0]]) || 0)
   }));
-  const imgDetalleAging3D = await renderizarGrafica3DCorreo({
+  const imgDetalleAging3D = renderizarGrafica3DCorreo({
     tipo: "bar",
     titulo: "Detalle Aging por Tipo de Análisis (USD Pending)",
     etiquetas: agingsPorDia.map(d => `Día ${d[0]}`),
@@ -1746,14 +1814,13 @@ async function abrirModalReporte() {
     alto: 330
   });
 
-  // Impacto semanal con TODAS las semanas visibles
   const mapSemUsd = {};
   for (const r of registrosFiltrados) {
     if (!r.semanaLost) continue;
     mapSemUsd[r.semanaLost] = (mapSemUsd[r.semanaLost] || 0) + r.usdInicial;
   }
   const semanasLost = Object.keys(mapSemUsd).sort();
-  const imgImpactoSem3D = await renderizarGrafica3DCorreo({
+  const imgImpactoSem3D = renderizarGrafica3DCorreo({
     tipo: "bar",
     titulo: "Impacto USD Inicial ($) por Semana Lost",
     etiquetas: semanasLost,
@@ -1768,8 +1835,6 @@ async function abrirModalReporte() {
 
   const htmlCorreo = `
     <div style="font-family: Arial, Helvetica, sans-serif; color: #1E293B; max-width: 820px; line-height: 1.6;">
-      
-      <!-- BANNER EJECUTIVO -->
       <div style="background:#1B365D; color:#FFFFFF; padding:18px 22px; border-radius:8px; border-bottom:5px solid #FFE600; margin-bottom:18px;">
         <div style="font-size:11px; text-transform:uppercase; letter-spacing:1.2px; color:#FFE600; font-weight:bold;">🛡️ Loss Prevention • Receiving Center MXRC03</div>
         <div style="font-size:20px; font-weight:bold; margin-top:3px;">Reporte Ejecutivo: Pending Lost MWH (${periodosActivos})</div>
@@ -1780,17 +1845,14 @@ async function abrirModalReporte() {
         Les comparto el <strong>análisis detallado actualizado</strong> sobre la generación de <strong>LOST</strong> en los agings con mayor impacto en <strong>MXRC03</strong>, el cual asciende a un <strong>monto total pendiente de <em>${fmtCorreoUSD(totalUsdPend)}</em></strong> (equivalente a <em>${totalPzsPend.toLocaleString("es-MX")} piezas pendientes</em>).
       </p>
 
-      <!-- GRÁFICA 3D: AGING COMPLETO -->
-      <div style="border:1px solid #CBD5E1; border-radius:8px; padding:8px; background:#FFFFFF; margin-bottom:24px; text-align:center; box-shadow:0 4px 10px rgba(0,0,0,0.06);">
+      <div style="border:1px solid #CBD5E1; border-radius:8px; padding:8px; background:#FFFFFF; margin-bottom:24px; text-align:center;">
         <img src="${imgAging3D}" alt="Gráfica Aging 3D" style="width:100%; max-width:790px; height:auto; display:block; margin:0 auto;">
       </div>
 
-      <!-- SUBTÍTULO GENERAL -->
       <div style="font-size:19px; font-weight:bold; color:#1B365D; border-bottom:2px solid #CBD5E1; padding-bottom:6px; margin-bottom:18px;">
         📌 Clasificaciones de Impacto
       </div>
 
-      <!-- SECCIÓN 1: ALTO VALOR (HV) -->
       <div style="margin-bottom:22px; background:#F8FAFC; border-left:5px solid #1B365D; padding:15px 18px; border-radius:0 8px 8px 0;">
         <div style="font-size:18px; font-weight:bold; color:#0F172A; margin-bottom:6px;">
           💎 1. Piezas de Alto Valor (HV)
@@ -1805,7 +1867,6 @@ async function abrirModalReporte() {
         </ul>
       </div>
 
-      <!-- SECCIÓN 2: PIEZAS > $100 USD -->
       <div style="margin-bottom:22px; background:#F8FAFC; border-left:5px solid #F59E0B; padding:15px 18px; border-radius:0 8px 8px 0;">
         <div style="font-size:18px; font-weight:bold; color:#0F172A; margin-bottom:6px;">
           💰 2. Piezas &gt; $100 USD
@@ -1820,7 +1881,6 @@ async function abrirModalReporte() {
         </ul>
       </div>
 
-      <!-- CUADRÍCULA 2x2 DE DONAS 3D -->
       <table style="width:100%; border-collapse:separate; border-spacing:10px; margin-bottom:24px;">
         <tr>
           <td style="width:50%; border:1px solid #CBD5E1; border-radius:8px; padding:6px; background:#FFFFFF;">
@@ -1840,7 +1900,6 @@ async function abrirModalReporte() {
         </tr>
       </table>
 
-      <!-- SECCIÓN 3: DETALLE AGINGS -->
       <div style="margin-bottom:24px;">
         <div style="font-size:18px; font-weight:bold; color:#1B365D; margin-bottom:8px;">
           ⏱️ 3. Detalle agings con mayor impacto pendiente
@@ -1853,7 +1912,6 @@ async function abrirModalReporte() {
         </div>
       </div>
 
-      <!-- SECCIÓN 4: GENERACIÓN POR SEMANA Y RESUMEN -->
       <div style="margin-bottom:22px;">
         <div style="font-size:18px; font-weight:bold; color:#1B365D; margin-bottom:8px;">
           📅 4. Detalle de generación por semana y estatus de Análisis
@@ -1915,7 +1973,7 @@ async function copiarReporteCorreo() {
     btn.textContent = "✅ ¡Copiado con gráficas 3D y formato! Pega en Gmail (Ctrl + V)";
     btn.style.background = "#10B981";
     setTimeout(() => {
-      btn.textContent = "📋 Copiar reporte con gráficas y formato (Para pegar en Gmail)";
+      btn.textContent = "📋 Copiar reporte con gráficas 3D y formato (Para Gmail)";
     }, 3500);
   } catch (err) {
     const range = document.createRange();
@@ -1927,3 +1985,14 @@ async function copiarReporteCorreo() {
     btn.textContent = "✅ ¡Copiado al portapapeles!";
   }
 }
+
+function cerrarModal(idModal) {
+  document.getElementById(idModal).style.display = "none";
+}
+
+function cerrarModalSiFondo(e, idModal) {
+  if (e.target.id === idModal) cerrarModal(idModal);
+}
+</script>
+</body>
+</html>
