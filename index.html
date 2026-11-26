@@ -143,9 +143,136 @@
       padding: 20px 24px;
       display: flex;
       flex-direction: column;
-      gap: 20px;
+      gap: 18px;
     }
 
+    /* =========================================================
+       BUSCADOR UNIFICADO ESTILO WMS ADMINML
+       ========================================================= */
+    .wms-search-bar {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .search-compound {
+      display: flex;
+      align-items: center;
+      background: var(--bg-body);
+      border: 1.5px solid var(--border-color);
+      border-radius: 8px;
+      overflow: hidden;
+      flex: 1;
+      min-width: 320px;
+      max-width: 620px;
+      transition: border-color 0.2s;
+    }
+    .search-compound:focus-within {
+      border-color: var(--accent-blue);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    }
+
+    .search-type-select {
+      background: #1E293B;
+      color: #F8FAFC;
+      border: none;
+      border-right: 1px solid var(--border-color);
+      padding: 10px 14px;
+      font-size: 12.5px;
+      font-weight: 700;
+      outline: none;
+      cursor: pointer;
+    }
+    .search-type-select option { background: #0F172A; color: #FFFFFF; }
+
+    .search-input-field {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: #FFFFFF;
+      padding: 10px 12px;
+      font-size: 13px;
+      outline: none;
+    }
+    .search-input-field::placeholder { color: #64748B; }
+
+    .btn-clear-input {
+      background: none;
+      border: none;
+      color: #60A5FA;
+      font-size: 11.5px;
+      font-weight: 600;
+      padding: 0 10px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .btn-clear-input:hover { color: var(--accent-yellow); text-decoration: underline; }
+
+    .search-icon-addon {
+      padding: 0 12px;
+      color: #64748B;
+      border-left: 1px solid rgba(255,255,255,0.06);
+      font-size: 14px;
+    }
+
+    .btn-wms-buscar {
+      background: var(--accent-blue);
+      color: #FFFFFF;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 20px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-wms-buscar:hover { background: #2563EB; }
+
+    .search-chips-wrap {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .wms-chip {
+      background: #1E293B;
+      border: 1px solid #475569;
+      color: #F8FAFC;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .wms-chip span.chip-type {
+      color: #93C5FD;
+      font-size: 10.5px;
+      text-transform: uppercase;
+      font-weight: 800;
+    }
+    .wms-chip button {
+      background: none;
+      border: none;
+      color: #94A3B8;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      padding: 0;
+      line-height: 1;
+    }
+    .wms-chip button:hover { color: #EF4444; }
+
+    /* =========================================================
+       FILTROS DESPLEGABLES SUPERIORES
+       ========================================================= */
     .filters-bar {
       background: var(--bg-card);
       border: 1px solid var(--border-color);
@@ -195,8 +322,8 @@
       position: absolute;
       top: calc(100% + 4px);
       left: 0;
-      min-width: 220px;
-      max-height: 260px;
+      min-width: 245px;
+      max-height: 280px;
       overflow-y: auto;
       background: #0F172A;
       border: 1px solid var(--accent-blue);
@@ -210,6 +337,7 @@
     .multi-option {
       display: flex;
       align-items: center;
+      justify-content: space-between;
       gap: 8px;
       padding: 6px 8px;
       border-radius: 5px;
@@ -218,7 +346,9 @@
       cursor: pointer;
     }
     .multi-option:hover { background: rgba(59, 130, 246, 0.2); }
+    .multi-option-left { display: flex; align-items: center; gap: 8px; }
     .multi-option input { accent-color: var(--accent-yellow); cursor: pointer; }
+    .aging-usd-tag { font-size: 10.5px; color: #FBBF24; font-weight: 700; }
 
     .active-pills-bar {
       display: none;
@@ -407,7 +537,7 @@
       border: 1px solid rgba(16, 185, 129, 0.35);
     }
 
-    /* BOTONES Y BADGES PARA DERIVADO CCM Y DETALLE PE */
+    /* BOTONES PARA CONCILIACIÓN GLOBAL, DERIVADO CCM Y DETALLE PE */
     .badge-derivado-si {
       display: inline-block;
       padding: 3px 8px;
@@ -461,6 +591,22 @@
     }
     .btn-mini-pe:hover { background: #9333EA; color: #FFFFFF; }
 
+    .btn-mini-conc {
+      background: rgba(16, 185, 129, 0.18);
+      color: #6EE7B7;
+      border: 1px solid rgba(16, 185, 129, 0.5);
+      border-radius: 5px;
+      padding: 5px 9px;
+      font-size: 10.5px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      white-space: nowrap;
+    }
+    .btn-mini-conc:hover { background: #059669; color: #FFFFFF; }
+
     /* MODALES */
     .modal-backdrop {
       display: none;
@@ -509,7 +655,6 @@
       font-size: 12px;
     }
 
-    /* 5 COLUMNAS EN RESUMEN DE MODAL PARA INCLUIR FECHA DE LOST */
     .modal-summary-strip {
       display: grid;
       grid-template-columns: repeat(5, 1fr);
@@ -590,18 +735,6 @@
       display: inline-block;
     }
     .badge-status-link:hover { background: var(--accent-yellow); color: #0F172A; }
-
-    .conciliacion-pill {
-      background: rgba(16, 185, 129, 0.12);
-      border: 1px solid rgba(16, 185, 129, 0.35);
-      color: #6EE7B7;
-      padding: 4px 8px;
-      border-radius: 6px;
-      font-size: 11px;
-      line-height: 1.4;
-      white-space: pre-line;
-      min-width: 165px;
-    }
 
     .detail-box-text {
       background: #0B1120;
@@ -728,14 +861,43 @@
 
     <button class="btn-report" onclick="abrirModalReporte()">✉️ Generar reporte</button>
     <button class="btn-refresh" onclick="cargarDatos(true)">🔄 Actualizar Datos</button>
-    <button class="btn-clear" onclick="limpiarTodosLosFiltros()">🗑️ Limpiar Multifiltros</button>
+    <button class="btn-clear" onclick="limpiarTodosLosFiltros()">🗑️ Limpiar Filtros</button>
   </div>
 </header>
 
 <main class="container">
 
+  <!-- =========================================================
+       BUSCADOR INTELIGENTE ESTILO WMS ADMINML (MELI / MU / ISSUE / IS)
+       ========================================================= -->
+  <section class="wms-search-bar">
+    <div class="search-compound">
+      <select id="wms-search-type" class="search-type-select" onchange="actualizarPlaceholderBusqueda()">
+        <option value="sku">Código ML</option>
+        <option value="ubicacion">Ubicación (MU)</option>
+        <option value="issue">Issue</option>
+        <option value="inbound">IS (Inbound)</option>
+      </select>
+      <input
+        type="text"
+        id="wms-search-input"
+        class="search-input-field"
+        placeholder="Ingresa un Código ML (Ej: JNCL08085)"
+        onkeydown="if(event.key==='Enter'){ event.preventDefault(); ejecutarBusquedaWMS(); }"
+      >
+      <button type="button" class="btn-clear-input" onclick="limpiarCajaBusqueda()">Limpiar búsqueda</button>
+      <span class="search-icon-addon">🔍</span>
+    </div>
+
+    <button type="button" class="btn-wms-buscar" onclick="ejecutarBusquedaWMS()">Buscar</button>
+
+    <div id="wms-search-chips" class="search-chips-wrap"></div>
+  </section>
+
+  <!-- MULTIFILTROS DESPLEGABLES SUPERIORES -->
   <section class="filters-bar" id="filters-container"></section>
 
+  <!-- ETIQUETAS DE FILTROS ACTIVOS -->
   <section class="active-pills-bar" id="active-pills-bar">
     <span class="pills-title">Filtros activos:</span>
     <div id="pills-list" style="display:flex; flex-wrap:wrap; gap:8px;"></div>
@@ -1032,10 +1194,10 @@
 </div>
 
 <!-- =========================================================
-     MODAL SECUNDARIO: VISOR DE DETERMINACIÓN CCM / DETALLE PE
+     MODAL SECUNDARIO: VISOR DE CONCILIACIÓN / DETERMINACIÓN CCM / DETALLE PE
      ========================================================= -->
 <div id="modal-info-extra" class="modal-backdrop" style="z-index: 150;" onclick="cerrarModalSiFondo(event, 'modal-info-extra')">
-  <div class="modal-card" style="max-width: 650px;">
+  <div class="modal-card" style="max-width: 680px;">
     <div class="modal-header">
       <div>
         <h2 id="modal-extra-titulo">Detalle Adicional</h2>
@@ -1082,7 +1244,7 @@
 
 <script>
 const DASHBOARD_API_URL = "https://pending-lost-api.abraham-velazquezvelazquez.workers.dev";
-const LOCAL_CACHE_KEY = "lp_pending_lost_cache_v6";
+const LOCAL_CACHE_KEY = "lp_pending_lost_cache_v7";
 const ANALYST_STORAGE_KEY = "lp_analista_activo";
 
 const OPCIONES_ANALISIS = [
@@ -1111,13 +1273,12 @@ const OPCIONES_RESPONSABLE = [
   "Josue"
 ];
 
-// Filtro 'aging' intercambiado en lugar de 'responsable', ordenado de mayor a menor
 const CONFIG_FILTROS = [
   { campo: "semanaLost",        etiqueta: "Semana Lost" },
   { campo: "hv",                etiqueta: "Categoría HV" },
   { campo: "rango",             etiqueta: "Rango USD" },
   { campo: "analisis",          etiqueta: "Análisis" },
-  { campo: "aging",             etiqueta: "Aging (Mayor a Menor)" },
+  { campo: "aging",             etiqueta: "Aging (Mayor $ USD)" },
   { campo: "semanaPago",        etiqueta: "Semana Pago" },
   { campo: "semanaSeguimiento", etiqueta: "Sem. Seguimiento" },
   { campo: "seguimiento",       etiqueta: "Seguimiento" }
@@ -1125,6 +1286,10 @@ const CONFIG_FILTROS = [
 
 let rawRegistros = [];
 let registrosFiltrados = [];
+
+// Almacena las búsquedas específicas estilo WMS: [{ tipo: 'sku'|'ubicacion'|'issue'|'inbound', etiqueta: 'Código ML', valor: 'JNCL08085' }]
+let busquedasWMS = [];
+
 const estadoFiltros = {
   semanaLost: new Set(),
   hv: new Set(),
@@ -1166,6 +1331,73 @@ function urlWmsInconsistencies(sku, ubicacion) {
 }
 function urlWmsMovements(sku, ubicacion) {
   return `https://wms.adminml.com/reports/movements?limit=50&sort=date_desc&offset=0&date_from=2026-09-01&date_to=2026-12-31&inventory_id=${encodeURIComponent(sku)}&storage_id=${encodeURIComponent(ubicacion)}`;
+}
+
+/* =========================================================================
+   BUSCADOR INTELIGENTE ESTILO WMS (MELI / MU / ISSUE / IS)
+   ========================================================================= */
+function actualizarPlaceholderBusqueda() {
+  const tipo = document.getElementById("wms-search-type").value;
+  const input = document.getElementById("wms-search-input");
+  const placeholders = {
+    sku: "Ingresa un Código ML (Ej: JNCL08085)",
+    ubicacion: "Ingresa una Ubicación / MU (Ej: MU-TT-FF-4D8-E56)",
+    issue: "Ingresa un número de Issue (Ej: 20000018903769)",
+    inbound: "Ingresa un número de IS / Inbound (Ej: 80673292)"
+  };
+  input.placeholder = placeholders[tipo] || "Ingresa valor a buscar...";
+  input.focus();
+}
+
+function limpiarCajaBusqueda() {
+  const input = document.getElementById("wms-search-input");
+  input.value = "";
+  input.focus();
+}
+
+function ejecutarBusquedaWMS() {
+  const tipo = document.getElementById("wms-search-type").value;
+  const input = document.getElementById("wms-search-input");
+  const valorRaw = input.value.trim().toUpperCase();
+  if (!valorRaw) return;
+
+  const etiquetasTipo = {
+    sku: "Código ML",
+    ubicacion: "MU",
+    issue: "Issue",
+    inbound: "IS"
+  };
+
+  // Evitar duplicados exactos
+  const yaExiste = busquedasWMS.some(b => b.tipo === tipo && b.valor === valorRaw);
+  if (!yaExiste) {
+    busquedasWMS.push({
+      tipo,
+      etiqueta: etiquetasTipo[tipo],
+      valor: valorRaw
+    });
+  }
+
+  input.value = "";
+  renderizarChipsBusquedaWMS();
+  aplicarFiltros();
+}
+
+function quitarBusquedaWMS(index) {
+  busquedasWMS.splice(index, 1);
+  renderizarChipsBusquedaWMS();
+  aplicarFiltros();
+}
+
+function renderizarChipsBusquedaWMS() {
+  const wrap = document.getElementById("wms-search-chips");
+  wrap.innerHTML = busquedasWMS.map((b, idx) => `
+    <span class="wms-chip">
+      <span class="chip-type">${b.etiqueta}:</span>
+      <span>${b.valor}</span>
+      <button type="button" onclick="quitarBusquedaWMS(${idx})" title="Quitar búsqueda">×</button>
+    </span>
+  `).join("");
 }
 
 function obtenerFechaHoyDDMMYYYY() {
@@ -1306,7 +1538,7 @@ async function cargarDatos(forzarRefresh = false) {
 }
 
 /* =========================================================================
-   MULTIFILTROS (CON AGING ORDENADO DE MAYOR A MENOR)
+   MULTIFILTROS (CON AGING ORDENADO DE MAYOR A MENOR POR SUMA DE USD PENDING $)
    ========================================================================= */
 function construirContenedoresMultifiltro() {
   const contenedor = document.getElementById("filters-container");
@@ -1330,13 +1562,21 @@ function toggleMenuFiltro(campo) {
 }
 
 function poblarOpcionesMultifiltros() {
+  // Calcular suma de USD Pending ($) por cada Aging para ordenarlos de mayor a menor afectación
+  const sumaUsdPorAging = {};
+  for (const r of rawRegistros) {
+    if (r.agingStr !== "") {
+      sumaUsdPorAging[r.agingStr] = (sumaUsdPorAging[r.agingStr] || 0) + r.usdPending;
+    }
+  }
+
   CONFIG_FILTROS.forEach(f => {
     const prop = f.campo === "analisis" ? "analisisNorm" : (f.campo === "aging" ? "agingStr" : f.campo);
     let unicos = [...new Set(rawRegistros.map(r => r[prop]).filter(v => v !== ""))];
 
-    // Ordenar Aging numéricamente de mayor a menor; el resto alfabéticamente
     if (f.campo === "aging") {
-      unicos.sort((a, b) => Number(b) - Number(a));
+      // Ordenar de mayor a menor según la suma total de USD Pending ($)
+      unicos.sort((a, b) => (sumaUsdPorAging[b] || 0) - (sumaUsdPorAging[a] || 0));
     } else {
       unicos.sort();
     }
@@ -1345,11 +1585,25 @@ function poblarOpcionesMultifiltros() {
     menu.innerHTML = unicos.map(val => {
       const checked = estadoFiltros[f.campo].has(val) ? "checked" : "";
       const valEscapado = val.replace(/"/g, "&quot;");
-      const etiquetaMostrar = f.campo === "aging" ? `${val} días` : val;
+      if (f.campo === "aging") {
+        const usdTotal = sumaUsdPorAging[val] || 0;
+        const usdTexto = fmtCompacto(usdTotal, true);
+        return `
+          <label class="multi-option">
+            <span class="multi-option-left">
+              <input type="checkbox" value="${valEscapado}" ${checked} onchange="alternarValorFiltro('${f.campo}', this.value)">
+              <span>Día ${val}</span>
+            </span>
+            <span class="aging-usd-tag">${usdTexto}</span>
+          </label>
+        `;
+      }
       return `
         <label class="multi-option">
-          <input type="checkbox" value="${valEscapado}" ${checked} onchange="alternarValorFiltro('${f.campo}', this.value)">
-          <span>${etiquetaMostrar}</span>
+          <span class="multi-option-left">
+            <input type="checkbox" value="${valEscapado}" ${checked} onchange="alternarValorFiltro('${f.campo}', this.value)">
+            <span>${val}</span>
+          </span>
         </label>
       `;
     }).join("");
@@ -1370,6 +1624,9 @@ function alternarValorFiltro(campo, valor) {
 
 function limpiarTodosLosFiltros() {
   Object.keys(estadoFiltros).forEach(k => estadoFiltros[k].clear());
+  busquedasWMS = [];
+  document.getElementById("wms-search-input").value = "";
+  renderizarChipsBusquedaWMS();
   poblarOpcionesMultifiltros();
   aplicarFiltros();
 }
@@ -1386,7 +1643,7 @@ function actualizarIndicadoresDeFiltro() {
     } else if (sel.size === 1) {
       btn.classList.add("has-selection");
       const unico = [...sel][0];
-      lbl.textContent = f.campo === "aging" ? `${unico} días` : unico;
+      lbl.textContent = f.campo === "aging" ? `Día ${unico}` : unico;
     } else {
       btn.classList.add("has-selection");
       lbl.textContent = `${sel.size} seleccionados`;
@@ -1429,6 +1686,16 @@ function actualizarIndicadoresDeFiltro() {
 
 function aplicarFiltros() {
   registrosFiltrados = rawRegistros.filter(r => {
+    // 1. Filtros del buscador WMS (si hay varios chips, basta que coincida con alguno de ellos)
+    if (busquedasWMS.length > 0) {
+      const coincideBusqueda = busquedasWMS.some(b => {
+        const valFila = (r[b.tipo] || "").toUpperCase();
+        return valFila.includes(b.valor);
+      });
+      if (!coincideBusqueda) return false;
+    }
+
+    // 2. Multifiltros desplegables / gráficas
     if (estadoFiltros.semanaLost.size > 0 && !estadoFiltros.semanaLost.has(r.semanaLost)) return false;
     if (estadoFiltros.hv.size > 0 && !estadoFiltros.hv.has(r.hv)) return false;
     if (estadoFiltros.rango.size > 0 && !estadoFiltros.rango.has(r.rango)) return false;
@@ -1678,7 +1945,7 @@ function renderizarTodasLasGraficas() {
 }
 
 /* =========================================================================
-   TABLAS Y MODAL DE DETALLE CON EDICIÓN, CCM, PE Y ENLACES WMS
+   TABLAS Y MODAL DE DETALLE CON BOTÓN CONCILIACIÓN GLOBAL, CCM Y PE
    ========================================================================= */
 function renderizarTablas() {
   const topRelevante = [...registrosFiltrados]
@@ -1767,10 +2034,14 @@ function abrirInfoExtra(rowNumber, tipo) {
     document.getElementById("modal-extra-titulo").textContent = `Determinación CCM — Issue ${reg.issue || "S/N"}`;
     document.getElementById("modal-extra-subtitulo").textContent = `Ubicación: ${reg.ubicacion} • Derivado: ${reg.derivado || "No especificado"}`;
     document.getElementById("modal-extra-contenido").textContent = reg.determinacionCCM || "Sin determinación registrada.";
-  } else {
+  } else if (tipo === "PE") {
     document.getElementById("modal-extra-titulo").textContent = `Detalle PE (Entrega / Inconsistencia / Folio) — Issue ${reg.issue || "S/N"}`;
     document.getElementById("modal-extra-subtitulo").textContent = `SKU: ${reg.sku} • Ubicación: ${reg.ubicacion}`;
     document.getElementById("modal-extra-contenido").textContent = reg.detallePE || "Sin detalle PE registrado.";
+  } else if (tipo === "CONC") {
+    document.getElementById("modal-extra-titulo").textContent = `Conciliación Global (Aging / Site / Tipo / Piezas) — Issue ${reg.issue || "S/N"}`;
+    document.getElementById("modal-extra-subtitulo").textContent = `SKU: ${reg.sku} • Ubicación: ${reg.ubicacion}`;
+    document.getElementById("modal-extra-contenido").textContent = reg.conciliacionGlobal || "Sin conciliación global registrada.";
   }
 
   document.getElementById("modal-info-extra").style.display = "flex";
@@ -1813,16 +2084,18 @@ function abrirDetalleTote(ubicacion) {
     const linkStatus = it.status
       ? `<a href="${urlWmsInconsistencies(it.sku, it.ubicacion)}" target="_blank" rel="noopener" class="badge-status-link">${it.status}</a>`
       : "—";
+
+    // Botón Ver conciliación si la casilla tiene información
     const conciliacionHtml = it.conciliacionGlobal
-      ? `<div class="conciliacion-pill">${it.conciliacionGlobal}</div>`
+      ? `<button type="button" class="btn-mini-conc" onclick="abrirInfoExtra(${it.rowNumber}, 'CONC')">📊 Ver conciliación</button>`
       : "—";
 
-    // Botón Ver Detalle PE si la columna tiene información
+    // Botón Ver detalle PE si la casilla tiene información
     const detallePeHtml = it.detallePE
       ? `<button type="button" class="btn-mini-pe" onclick="abrirInfoExtra(${it.rowNumber}, 'PE')">📦 Ver detalle PE</button>`
       : "—";
 
-    // Estatus Derivado + Botón Ver determinación si ya existe Determinación CCM
+    // Estatus Derivado + Botón Ver determinación si existe Determinación CCM
     const esDerivadoSi = it.derivado.toUpperCase() === "SI";
     const badgeDerivado = it.derivado
       ? `<span class="${esDerivadoSi ? "badge-derivado-si" : "badge-derivado-no"}">Derivado: ${it.derivado}</span>`
@@ -1892,7 +2165,6 @@ async function guardarCambiosFila(rowNumber) {
   const btn = document.getElementById(`btn-save-${rowNumber}`);
   const msgEl = document.getElementById(`msg-save-${rowNumber}`);
 
-  // Si se ingresó o modificó un comentario, actualizar Fecha validación (NO toca Semana Seguimiento formulada)
   const comentarioCambio = comentarios !== reg.comentarios && comentarios !== "";
   const fechaValidacion = obtenerFechaHoyDDMMYYYY();
 
