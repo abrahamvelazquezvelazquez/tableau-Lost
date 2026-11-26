@@ -2087,12 +2087,12 @@ function abrirDetalleTote(ubicacion) {
 
     // Botón Ver conciliación si la casilla tiene información
     const conciliacionHtml = it.conciliacionGlobal
-      ? `<button type="button" class="btn-mini-conc" onclick="abrirInfoExtra(${it.rowNumber}, 'CONC')">📊 Ver conciliación</button>`
+      ? `<button type="button" class="btn-mini-conc" onclick="abrirInfoExtra(${it.rowNumber}, 'CONC')">📊 Piezas para CG</button>`
       : "—";
 
     // Botón Ver detalle PE si la casilla tiene información
     const detallePeHtml = it.detallePE
-      ? `<button type="button" class="btn-mini-pe" onclick="abrirInfoExtra(${it.rowNumber}, 'PE')">📦 Ver detalle PE</button>`
+      ? `<button type="button" class="btn-mini-pe" onclick="abrirInfoExtra(${it.rowNumber}, 'PE')">📦 Ver piezas localizadas</button>`
       : "—";
 
     // Estatus Derivado + Botón Ver determinación si existe Determinación CCM
