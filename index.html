@@ -34,12 +34,12 @@
       background: linear-gradient(90deg, #0F172A 0%, #1E293B 100%);
       border-bottom: 1px solid var(--border-color);
       border-top: 4px solid var(--accent-yellow);
-      padding: 16px 28px;
+      padding: 14px 28px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
-      gap: 16px;
+      gap: 14px;
       position: sticky;
       top: 0;
       z-index: 50;
@@ -63,6 +63,34 @@
     .brand-sub { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
 
     .topbar-controls { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+    .analyst-box {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: #0B1120;
+      border: 1.5px solid var(--accent-emerald);
+      padding: 6px 12px;
+      border-radius: 8px;
+    }
+    .analyst-box label {
+      font-size: 11px;
+      font-weight: 800;
+      color: #6EE7B7;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      margin: 0;
+    }
+    .analyst-box select {
+      background: transparent;
+      color: #FFFFFF;
+      border: none;
+      font-size: 12.5px;
+      font-weight: 700;
+      outline: none;
+      cursor: pointer;
+    }
+    .analyst-box select option { background: #0F172A; color: #FFFFFF; }
 
     .btn-report {
       background: var(--accent-yellow);
@@ -124,8 +152,8 @@
       border-radius: 12px;
       padding: 16px 20px;
       display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap: 12px;
+      grid-template-columns: repeat(8, 1fr);
+      gap: 10px;
     }
 
     .filter-item { position: relative; }
@@ -360,6 +388,17 @@
     .tote-link { color: #60A5FA; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
     .num-right { text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; white-space: nowrap; }
 
+    .analyst-pill {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 700;
+      background: rgba(16, 185, 129, 0.18);
+      color: #6EE7B7;
+      border: 1px solid rgba(16, 185, 129, 0.35);
+    }
+
     /* MODALES */
     .modal-backdrop {
       display: none;
@@ -370,7 +409,7 @@
       z-index: 100;
       justify-content: center;
       align-items: center;
-      padding: 20px;
+      padding: 16px;
     }
 
     .modal-card {
@@ -379,8 +418,8 @@
       border-top: 4px solid var(--accent-yellow);
       border-radius: 14px;
       width: 100%;
-      max-width: 1340px;
-      max-height: 90vh;
+      max-width: 1440px;
+      max-height: 92vh;
       display: flex;
       flex-direction: column;
       box-shadow: 0 25px 50px rgba(0,0,0,0.65);
@@ -412,14 +451,70 @@
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 12px;
-      padding: 14px 22px;
+      padding: 12px 22px;
       background: var(--bg-card-alt);
       border-bottom: 1px solid var(--border-color);
     }
     .m-stat span { display: block; font-size: 10.5px; color: var(--text-secondary); text-transform: uppercase; font-weight: 700; }
     .m-stat strong { display: block; font-size: 16px; color: #FFFFFF; margin-top: 2px; }
 
-    .modal-body { padding: 16px 22px; overflow-y: auto; }
+    .modal-body { padding: 14px 20px; overflow-y: auto; }
+
+    /* CONTROLES EDITABLES EN EL MODAL */
+    .edit-select {
+      background: #0B1120;
+      color: #F8FAFC;
+      border: 1px solid #3B82F6;
+      border-radius: 6px;
+      padding: 6px 8px;
+      font-size: 11.5px;
+      font-weight: 600;
+      outline: none;
+      cursor: pointer;
+      min-width: 125px;
+    }
+    .edit-select:focus { border-color: var(--accent-yellow); }
+
+    .edit-comment {
+      background: #0B1120;
+      color: #F8FAFC;
+      border: 1px solid #475569;
+      border-radius: 6px;
+      padding: 6px 8px;
+      font-size: 11.5px;
+      width: 240px;
+      min-height: 44px;
+      resize: vertical;
+      outline: none;
+      font-family: 'Inter', sans-serif;
+    }
+    .edit-comment:focus { border-color: var(--accent-yellow); background: #0F172A; }
+
+    .btn-save-row {
+      background: var(--accent-emerald);
+      color: #FFFFFF;
+      border: none;
+      border-radius: 6px;
+      padding: 7px 11px;
+      font-size: 11.5px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: background 0.2s;
+    }
+    .btn-save-row:hover { background: #059669; }
+    .btn-save-row:disabled { background: #475569; cursor: not-allowed; }
+
+    .save-feedback {
+      display: block;
+      font-size: 10px;
+      font-weight: 700;
+      margin-top: 4px;
+      color: #6EE7B7;
+    }
 
     .badge-status-link {
       padding: 4px 9px;
@@ -443,7 +538,7 @@
       font-size: 11px;
       line-height: 1.4;
       white-space: pre-line;
-      min-width: 170px;
+      min-width: 165px;
     }
 
     .email-preview-container {
@@ -522,7 +617,7 @@
 
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-    @media (max-width: 1150px) {
+    @media (max-width: 1250px) {
       .top-analytics-grid, .grid-2-cols { grid-template-columns: 1fr; }
       .filters-bar { grid-template-columns: repeat(2, 1fr); }
     }
@@ -545,6 +640,19 @@
     </div>
   </div>
   <div class="topbar-controls">
+    <!-- SELECTOR DE ANALISTA ACTIVO -->
+    <div class="analyst-box" title="Selecciona tu nombre para asignarlo automáticamente al dar seguimiento">
+      <label for="analista-activo">👤 Seguimiento por:</label>
+      <select id="analista-activo" onchange="guardarAnalistaPreferido()">
+        <option value="">Seleccionar analista...</option>
+        <option value="Abraham">Abraham</option>
+        <option value="Kathia">Kathia</option>
+        <option value="Arturo">Arturo</option>
+        <option value="Daniel">Daniel</option>
+        <option value="Josue">Josue</option>
+      </select>
+    </div>
+
     <button class="btn-report" onclick="abrirModalReporte()">✉️ Generar reporte</button>
     <button class="btn-refresh" onclick="cargarDatos(true)">🔄 Actualizar Datos</button>
     <button class="btn-clear" onclick="limpiarTodosLosFiltros()">🗑️ Limpiar Multifiltros</button>
@@ -680,14 +788,14 @@
     </div>
   </section>
 
-  <!-- BLOQUE 3: TABLA SEGUIMIENTO RELEVANTE (SIN CONCILIACIÓN GLOBAL EN PANTALLA PRINCIPAL) -->
+  <!-- BLOQUE 3: TABLA SEGUIMIENTO RELEVANTE -->
   <section class="card-full">
     <div class="chart-header">
       <div class="chart-title-row">
         <h3 class="chart-title">Seguimiento relevante (Top 25 Issues con mayor impacto pendiente)</h3>
-        <span class="tag" style="color:#FFE600;">Clic en SKU / Ubicación abre WMS • Clic en fila abre detalle con Conciliación Global</span>
+        <span class="tag" style="color:#FFE600;">Clic en fila para editar Comentarios / Análisis / Responsable</span>
       </div>
-      <div class="chart-desc">Ordenado de mayor a menor <strong>USD Pending ($)</strong> • Enlaces directos a reportes de WMS AdminML</div>
+      <div class="chart-desc">Ordenado de mayor a menor <strong>USD Pending ($)</strong> • Enlaces directos a WMS AdminML</div>
     </div>
     <div class="table-wrapper">
       <table>
@@ -701,6 +809,7 @@
             <th class="num-right">Qty pending</th>
             <th class="num-right">USD Pending</th>
             <th>HV</th>
+            <th>Responsable</th>
             <th>Comentarios</th>
             <th>Análisis</th>
             <th class="num-right">Piezas ticket indebidas</th>
@@ -754,7 +863,7 @@
       <div class="chart-header">
         <div class="chart-title-row">
           <h3 class="chart-title">Totes perdidos</h3>
-          <span class="tag" style="color:#FFE600;">Clic en un Tote para ver detalle</span>
+          <span class="tag" style="color:#FFE600;">Clic en un Tote para ver detalle y editar</span>
         </div>
         <div class="chart-desc">Ubicaciones con <strong>Análisis</strong> vacío o igual a <strong>Seguimiento CCM</strong></div>
       </div>
@@ -777,7 +886,7 @@
       <div class="chart-header">
         <div class="chart-title-row">
           <h3 class="chart-title">Totes localizados / con inconsistencia</h3>
-          <span class="tag" style="color:#FFE600;">Clic en un Tote para ver detalle</span>
+          <span class="tag" style="color:#FFE600;">Clic en un Tote para ver detalle y editar</span>
         </div>
         <div class="chart-desc">Ubicaciones con cualquier otro <strong>Análisis</strong> distinto a vacío o Seguimiento CCM</div>
       </div>
@@ -799,13 +908,15 @@
 
 </main>
 
-<!-- MODAL 1: DETALLE DE TOTE (INCLUYE CONCILIACIÓN GLOBAL) -->
+<!-- =========================================================
+     MODAL 1: DETALLE Y EDICIÓN EN TIEMPO REAL DEL TOTE
+     ========================================================= -->
 <div id="modal-tote" class="modal-backdrop" onclick="cerrarModalSiFondo(event, 'modal-tote')">
   <div class="modal-card">
     <div class="modal-header">
       <div>
-        <h2 id="modal-tote-titulo">Detalle de Ubicación: ---</h2>
-        <p id="modal-tote-subtitulo">Incluye Conciliación Global y enlaces directos a Inbound, SKU e Inconsistencias en WMS</p>
+        <h2 id="modal-tote-titulo">Detalle y Seguimiento de Ubicación: ---</h2>
+        <p id="modal-tote-subtitulo">Edita Responsable, Comentarios o Análisis y presiona <strong>Guardar</strong> (al modificar comentario se actualiza automáticamente la Fecha de Seguimiento)</p>
       </div>
       <button class="btn-close-modal" onclick="cerrarModal('modal-tote')">✕ Cerrar</button>
     </div>
@@ -816,24 +927,25 @@
       <div class="m-stat"><span>USD Pending Total</span><strong id="m-usd-pend" style="color:#FFE600;">$0.00</strong></div>
     </div>
     <div class="modal-body">
-      <div class="table-wrapper" style="max-height:54vh;">
+      <div class="table-wrapper" style="max-height:58vh;">
         <table>
           <thead>
             <tr>
               <th>Semana</th>
               <th>Aging</th>
               <th>Issue</th>
-              <th>Inbound (WMS)</th>
-              <th>SKU (WMS)</th>
+              <th>Inbound</th>
+              <th>SKU</th>
               <th>Título</th>
-              <th class="num-right">Qty Ini</th>
               <th class="num-right">Qty Pend</th>
               <th class="num-right">USD Pend</th>
               <th>Conciliación Global</th>
-              <th>Fecha Pago</th>
-              <th>Status (WMS)</th>
-              <th>Análisis</th>
-              <th>Comentarios</th>
+              <th>Status</th>
+              <th>Fecha Validación</th>
+              <th>Responsable Análisis</th>
+              <th>Comentarios (Editable)</th>
+              <th>Análisis (Editable)</th>
+              <th>Acción</th>
             </tr>
           </thead>
           <tbody id="tbody-modal-detalle"></tbody>
@@ -843,7 +955,9 @@
   </div>
 </div>
 
-<!-- MODAL 2: BORRADOR DE REPORTE CORPORATIVO -->
+<!-- =========================================================
+     MODAL 2: BORRADOR DE REPORTE CORPORATIVO
+     ========================================================= -->
 <div id="modal-reporte" class="modal-backdrop" onclick="cerrarModalSiFondo(event, 'modal-reporte')">
   <div class="modal-card" style="max-width: 920px;">
     <div class="modal-header">
@@ -874,13 +988,42 @@
 
 <script>
 const DASHBOARD_API_URL = "https://pending-lost-api.abraham-velazquezvelazquez.workers.dev";
-const LOCAL_CACHE_KEY = "lp_pending_lost_cache_v3";
+const LOCAL_CACHE_KEY = "lp_pending_lost_cache_v4";
+const ANALYST_STORAGE_KEY = "lp_analista_activo";
+
+// Listas desplegables idénticas a la hoja Seguimiento de Google Sheets
+const OPCIONES_ANALISIS = [
+  "Inflación de IS",
+  "Cruce de IS",
+  "Solicitud para CG",
+  "Cruce de ML",
+  "Conciliación por FIFO",
+  "Error en decanting",
+  "Destino incorrecto",
+  "Cruce HU",
+  "Producto localizado en RC03",
+  "Seguimiento CCM",
+  "Error de PA",
+  "Desviación operativa",
+  "Sin respuesta CCM",
+  "Seguimiento destino",
+  "Error valor seguro"
+];
+
+const OPCIONES_RESPONSABLE = [
+  "Abraham",
+  "Kathia",
+  "Arturo",
+  "Daniel",
+  "Josue"
+];
 
 const CONFIG_FILTROS = [
   { campo: "semanaLost",        etiqueta: "Semana Lost" },
   { campo: "hv",                etiqueta: "Categoría HV" },
   { campo: "rango",             etiqueta: "Rango USD" },
   { campo: "analisis",          etiqueta: "Análisis" },
+  { campo: "responsable",       etiqueta: "Responsable" },
   { campo: "semanaPago",        etiqueta: "Semana Pago" },
   { campo: "semanaSeguimiento", etiqueta: "Sem. Seguimiento" },
   { campo: "seguimiento",       etiqueta: "Seguimiento" }
@@ -893,6 +1036,7 @@ const estadoFiltros = {
   hv: new Set(),
   rango: new Set(),
   analisis: new Set(),
+  responsable: new Set(),
   semanaPago: new Set(),
   semanaSeguimiento: new Set(),
   seguimiento: new Set(),
@@ -915,17 +1059,38 @@ const fmtUSD = (val) => "$" + Number(val || 0).toLocaleString("es-MX", { minimum
 function urlWmsSku(sku) {
   return `https://wms.adminml.com/reports/skus/${encodeURIComponent(sku)}`;
 }
-
 function urlWmsMuTransfer(sku, ubicacion) {
   return `https://wms.adminml.com/reports/mu-in-transfer?last_updated_from=2026-01-01&last_updated_to=2026-12-31&inventory_id=${encodeURIComponent(sku)}&transfer_unit_container_id=${encodeURIComponent(ubicacion)}`;
 }
-
 function urlWmsInbound(inbound) {
   return `https://wms.adminml.com/reports/inbound-shipment/${encodeURIComponent(inbound)}`;
 }
-
 function urlWmsInconsistencies(sku, ubicacion) {
   return `https://wms.adminml.com/reports/inconsistencies?inventory_id=${encodeURIComponent(sku)}&site_id=MLM&date_to=2027-01-01T05%3A59%3A00.000%2B00%3A00&date_from=2026-01-01T06%3A00%3A00.000%2B00%3A00&sort=date_last_updated_desc&address_id=${encodeURIComponent(ubicacion)}`;
+}
+
+// Calcula la fecha actual en DD/MM/YYYY y la semana ISO en formato "YYYY Www"
+function obtenerFechaYsemanaHoy() {
+  const hoy = new Date();
+  const dd = String(hoy.getDate()).padStart(2, "0");
+  const mm = String(hoy.getMonth() + 1).padStart(2, "0");
+  const yyyy = hoy.getFullYear();
+  const fechaValidacion = `${dd}/${mm}/${yyyy}`;
+
+  // Cálculo de semana ISO
+  const tempDate = new Date(Date.UTC(hoy.getFullYear(), hoy.getMonth(), hoy.getDate()));
+  const dayNum = tempDate.getUTCDay() || 7;
+  tempDate.setUTCDate(tempDate.getUTCDate() + 4 - dayNum);
+  const yearStart = new Date(Date.UTC(tempDate.getUTCFullYear(), 0, 1));
+  const weekNo = Math.ceil((((tempDate - yearStart) / 86400000) + 1) / 7);
+  const semanaSeguimiento = `${tempDate.getUTCFullYear()} W${weekNo}`;
+
+  return { fechaValidacion, semanaSeguimiento };
+}
+
+function guardarAnalistaPreferido() {
+  const val = document.getElementById("analista-activo").value;
+  localStorage.setItem(ANALYST_STORAGE_KEY, val);
 }
 
 function hidratarRegistros(lista) {
@@ -958,20 +1123,23 @@ function hidratarRegistros(lista) {
         comentarios: r[20] || "",
         analisis,
         conciliacionGlobal: r[22] || "",
+        rowNumber: Number(r[23]) || 0,
+        fechaValidacion: r[24] || "",
+        responsable: r[25] || "",
         analisisNorm: analisis || "Sin análisis",
         agingStr: agingRaw !== "" ? String(Math.round(Number(r[1]) || 0)) : ""
       };
     });
   }
-  return lista.map(r => ({
-    ...r,
-    conciliacionGlobal: r.conciliacionGlobal || "",
-    analisisNorm: r.analisis || "Sin análisis",
-    agingStr: r.agingRaw !== "" ? String(Math.round(r.aging)) : ""
-  }));
+  return lista;
 }
 
 window.addEventListener("DOMContentLoaded", () => {
+  const analistaGuardado = localStorage.getItem(ANALYST_STORAGE_KEY);
+  if (analistaGuardado) {
+    document.getElementById("analista-activo").value = analistaGuardado;
+  }
+
   construirContenedoresMultifiltro();
   cargarDatos(false);
 
@@ -998,7 +1166,7 @@ async function cargarDatos(forzarRefresh = false) {
         overlay.style.display = "none";
         yaMostroCache = true;
         document.getElementById("last-sync").textContent =
-          `Vista rápida (${rawRegistros.length.toLocaleString("es-MX")} registros) • Sincronizando actualizaciones...`;
+          `Vista rápida (${rawRegistros.length.toLocaleString("es-MX")} registros) • Sincronizando...`;
       }
     } catch (_) {}
   }
@@ -1131,6 +1299,7 @@ function actualizarIndicadoresDeFiltro() {
     hv: "HV",
     rango: "Rango USD",
     analisis: "Análisis",
+    responsable: "Responsable",
     semanaPago: "Semana Pago",
     semanaSeguimiento: "Sem. Seguimiento",
     seguimiento: "Seguimiento",
@@ -1164,6 +1333,7 @@ function aplicarFiltros() {
     if (estadoFiltros.hv.size > 0 && !estadoFiltros.hv.has(r.hv)) return false;
     if (estadoFiltros.rango.size > 0 && !estadoFiltros.rango.has(r.rango)) return false;
     if (estadoFiltros.analisis.size > 0 && !estadoFiltros.analisis.has(r.analisisNorm)) return false;
+    if (estadoFiltros.responsable.size > 0 && !estadoFiltros.responsable.has(r.responsable)) return false;
     if (estadoFiltros.semanaPago.size > 0 && !estadoFiltros.semanaPago.has(r.semanaPago)) return false;
     if (estadoFiltros.semanaSeguimiento.size > 0 && !estadoFiltros.semanaSeguimiento.has(r.semanaSeguimiento)) return false;
     if (estadoFiltros.seguimiento.size > 0 && !estadoFiltros.seguimiento.has(r.seguimiento)) return false;
@@ -1178,7 +1348,7 @@ function aplicarFiltros() {
 }
 
 /* =========================================================================
-   KPIs
+   KPIs Y GRÁFICAS
    ========================================================================= */
 function fmtCompacto(num, esMoneda = false) {
   const pref = esMoneda ? "$" : "";
@@ -1216,9 +1386,6 @@ function actualizarKPIs() {
   document.getElementById("kpi-usd-seg").textContent = fmtCompacto(usdSeg, true);
 }
 
-/* =========================================================================
-   GRÁFICAS
-   ========================================================================= */
 function agruparSuma(lista, keyFn, valFn) {
   const map = {};
   for (const item of lista) {
@@ -1412,7 +1579,7 @@ function renderizarTodasLasGraficas() {
 }
 
 /* =========================================================================
-   TABLAS PRINCIPALES Y MODAL DETALLE DE TOTE (CON CONCILIACIÓN GLOBAL)
+   TABLAS Y MODAL DE DETALLE CON EDICIÓN EN TIEMPO REAL
    ========================================================================= */
 function renderizarTablas() {
   const topRelevante = [...registrosFiltrados]
@@ -1425,18 +1592,20 @@ function renderizarTablas() {
     const alpha = Math.max(0.12, (r.usdPending / maxUsdRel) * 0.65).toFixed(2);
     const linkSku = r.sku ? `<a href="${urlWmsSku(r.sku)}" target="_blank" rel="noopener" class="wms-link-sku" onclick="event.stopPropagation()" title="Ver SKU en WMS">${r.sku}</a>` : "—";
     const linkUbi = r.ubicacion ? `<a href="${urlWmsMuTransfer(r.sku, r.ubicacion)}" target="_blank" rel="noopener" class="wms-link" onclick="event.stopPropagation()" title="Ver MU in Transfer en WMS">${r.ubicacion}</a>` : "—";
+    const respBadge = r.responsable ? `<span class="analyst-pill">${r.responsable}</span>` : "—";
 
     return `
       <tr class="clickable-tote" onclick="abrirDetalleTote('${r.ubicacion.replace(/'/g, "\\'")}')">
         <td><strong>${r.agingRaw}</strong></td>
         <td>${r.issue}</td>
         <td>${linkSku}</td>
-        <td style="max-width:250px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${r.titulo}">${r.titulo}</td>
+        <td style="max-width:230px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${r.titulo}">${r.titulo}</td>
         <td>${linkUbi}</td>
         <td class="num-right">${r.qtyPending.toLocaleString("es-MX")}</td>
         <td class="num-right" style="background:rgba(239, 68, 68, ${alpha});">$${r.usdPending.toLocaleString("es-MX", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
         <td>${r.hv || "—"}</td>
-        <td style="max-width:220px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${r.comentarios}">${r.comentarios || "—"}</td>
+        <td>${respBadge}</td>
+        <td style="max-width:210px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${r.comentarios}">${r.comentarios || "—"}</td>
         <td>${r.analisisNorm}</td>
         <td class="num-right">${r.piezasIndebidas.toLocaleString("es-MX")}</td>
       </tr>
@@ -1493,6 +1662,7 @@ function renderizarTablas() {
 function abrirDetalleTote(ubicacion) {
   if (!ubicacion) return;
   const items = registrosFiltrados.filter(r => r.ubicacion === ubicacion);
+  const analistaGlobal = document.getElementById("analista-activo").value;
 
   let sumIni = 0, sumPend = 0, sumUsd = 0;
   for (const it of items) {
@@ -1501,8 +1671,7 @@ function abrirDetalleTote(ubicacion) {
     sumUsd += it.usdPending;
   }
 
-  document.getElementById("modal-tote-titulo").textContent = `Detalle de Ubicación (Tote): ${ubicacion}`;
-  document.getElementById("modal-tote-subtitulo").textContent = `Mostrando ${items.length} registro(s) • Incluye Conciliación Global y enlaces directos a WMS`;
+  document.getElementById("modal-tote-titulo").textContent = `Detalle y Seguimiento de Tote: ${ubicacion}`;
   document.getElementById("m-total-lineas").textContent = items.length;
   document.getElementById("m-qty-ini").textContent = sumIni.toLocaleString("es-MX");
   document.getElementById("m-qty-pend").textContent = sumPend.toLocaleString("es-MX");
@@ -1510,39 +1679,136 @@ function abrirDetalleTote(ubicacion) {
 
   document.getElementById("tbody-modal-detalle").innerHTML = items.map(it => {
     const linkInbound = it.inbound
-      ? `<a href="${urlWmsInbound(it.inbound)}" target="_blank" rel="noopener" class="wms-link" title="Abrir Inbound Shipment en WMS">${it.inbound}</a>`
+      ? `<a href="${urlWmsInbound(it.inbound)}" target="_blank" rel="noopener" class="wms-link">${it.inbound}</a>`
       : "—";
     const linkSku = it.sku
-      ? `<a href="${urlWmsSku(it.sku)}" target="_blank" rel="noopener" class="wms-link-sku" title="Abrir SKU en WMS">${it.sku}</a>`
+      ? `<a href="${urlWmsSku(it.sku)}" target="_blank" rel="noopener" class="wms-link-sku">${it.sku}</a>`
       : "—";
     const linkStatus = it.status
-      ? `<a href="${urlWmsInconsistencies(it.sku, it.ubicacion)}" target="_blank" rel="noopener" class="badge-status-link" title="Abrir Inconsistencias en WMS">${it.status}</a>`
+      ? `<a href="${urlWmsInconsistencies(it.sku, it.ubicacion)}" target="_blank" rel="noopener" class="badge-status-link">${it.status}</a>`
       : "—";
     const conciliacionHtml = it.conciliacionGlobal
       ? `<div class="conciliacion-pill">${it.conciliacionGlobal}</div>`
       : "—";
 
+    // Preseleccionar responsable de la fila o el analista activo en la barra superior
+    const respActual = it.responsable || analistaGlobal || "";
+    const opcionesRespHtml = `<option value="">Sin asignar...</option>` +
+      OPCIONES_RESPONSABLE.map(op => `<option value="${op}" ${respActual === op ? "selected" : ""}>${op}</option>`).join("");
+
+    const opcionesAnHtml = `<option value="">Sin análisis...</option>` +
+      OPCIONES_ANALISIS.map(op => `<option value="${op}" ${it.analisis === op ? "selected" : ""}>${op}</option>`).join("");
+
     return `
-      <tr>
+      <tr id="row-edit-${it.rowNumber}">
         <td>${it.semanaLost}</td>
         <td><strong>${it.agingRaw}</strong></td>
         <td>${it.issue}</td>
         <td>${linkInbound}</td>
         <td>${linkSku}</td>
-        <td>${it.titulo}</td>
-        <td class="num-right">${it.qtyInicial.toLocaleString("es-MX")}</td>
+        <td style="min-width:170px;">${it.titulo}</td>
         <td class="num-right">${it.qtyPending.toLocaleString("es-MX")}</td>
         <td class="num-right" style="color:#FFE600;">$${it.usdPending.toLocaleString("es-MX", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
         <td>${conciliacionHtml}</td>
-        <td>${it.fechaPago || "—"}</td>
         <td>${linkStatus}</td>
-        <td>${it.analisisNorm}</td>
-        <td>${it.comentarios || "—"}</td>
+        <td id="cell-fecha-${it.rowNumber}" style="white-space:nowrap; font-size:11.5px; color:#CBD5E1;">
+          ${it.fechaValidacion || "—"}<br>
+          <span style="font-size:10px; color:#94A3B8;">${it.semanaSeguimiento || ""}</span>
+        </td>
+        <td>
+          <select id="sel-resp-${it.rowNumber}" class="edit-select">
+            ${opcionesRespHtml}
+          </select>
+        </td>
+        <td>
+          <textarea id="txt-comm-${it.rowNumber}" class="edit-comment" placeholder="Escribe seguimiento aquí...">${it.comentarios}</textarea>
+        </td>
+        <td>
+          <select id="sel-an-${it.rowNumber}" class="edit-select" style="min-width:175px;">
+            ${opcionesAnHtml}
+          </select>
+        </td>
+        <td>
+          <button type="button" id="btn-save-${it.rowNumber}" class="btn-save-row" onclick="guardarCambiosFila(${it.rowNumber})">
+            💾 Guardar
+          </button>
+          <span id="msg-save-${it.rowNumber}" class="save-feedback"></span>
+        </td>
       </tr>
     `;
   }).join("");
 
   document.getElementById("modal-tote").style.display = "flex";
+}
+
+async function guardarCambiosFila(rowNumber) {
+  const reg = rawRegistros.find(r => r.rowNumber === rowNumber);
+  if (!reg) return;
+
+  const responsable = document.getElementById(`sel-resp-${rowNumber}`).value;
+  const comentarios = document.getElementById(`txt-comm-${rowNumber}`).value.trim();
+  const analisis = document.getElementById(`sel-an-${rowNumber}`).value;
+  const btn = document.getElementById(`btn-save-${rowNumber}`);
+  const msgEl = document.getElementById(`msg-save-${rowNumber}`);
+
+  // Si se ingresó o modificó un comentario, actualizar la fecha de seguimiento automáticamente
+  const comentarioCambio = comentarios !== reg.comentarios && comentarios !== "";
+  const { fechaValidacion, semanaSeguimiento } = obtenerFechaYsemanaHoy();
+
+  btn.disabled = true;
+  btn.textContent = "⏳ Guardando...";
+  msgEl.textContent = "";
+
+  try {
+    const resp = await fetch(DASHBOARD_API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        rowNumber,
+        responsable,
+        comentarios,
+        analisis,
+        actualizarFecha: comentarioCambio,
+        fechaValidacion,
+        semanaSeguimiento
+      })
+    });
+
+    const data = await resp.json();
+    if (data.error) throw new Error(data.error);
+
+    // Actualizar el registro en memoria y en localStorage al instante
+    reg.responsable = responsable;
+    reg.comentarios = comentarios;
+    reg.analisis = analisis;
+    reg.analisisNorm = analisis || "Sin análisis";
+
+    if (comentarioCambio) {
+      reg.fechaValidacion = fechaValidacion;
+      reg.semanaSeguimiento = semanaSeguimiento;
+      document.getElementById(`cell-fecha-${rowNumber}`).innerHTML = `
+        <strong style="color:#6EE7B7;">${fechaValidacion}</strong><br>
+        <span style="font-size:10px; color:#94A3B8;">${semanaSeguimiento}</span>
+      `;
+    }
+
+    // Limpiar caché local para mantener sincronía y refrescar gráficas/tablas de fondo
+    localStorage.removeItem(LOCAL_CACHE_KEY);
+    poblarOpcionesMultifiltros();
+    aplicarFiltros();
+
+    btn.textContent = "✅ Guardado";
+    msgEl.textContent = comentarioCambio ? `Fecha act: ${fechaValidacion}` : "Actualizado en Sheets";
+    setTimeout(() => {
+      btn.disabled = false;
+      btn.textContent = "💾 Guardar";
+    }, 2200);
+
+  } catch (err) {
+    alert("❌ Error al guardar en Google Sheets: " + err.message);
+    btn.disabled = false;
+    btn.textContent = "💾 Guardar";
+  }
 }
 
 /* =========================================================================
@@ -1559,6 +1825,8 @@ function obtenerEmojiAnalisis(nombre) {
   if (n.includes("SOLICITUD") || n.includes("CG")) return "🌐";
   if (n.includes("DESTINO")) return "🚚";
   if (n.includes("FIFO")) return "⏳";
+  if (n.includes("DECANTING")) return "📦";
+  if (n.includes("VALOR SEGURO")) return "🛡️";
   if (n.includes("SIN ANÁLISIS") || n.includes("SIN ANALISIS")) return "📋";
   return "📌";
 }
