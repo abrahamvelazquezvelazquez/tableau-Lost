@@ -97,15 +97,15 @@ def buscar_pe_lost():
 
         llave_busqueda = str(fila[1]).strip()  # Columna B: ISSUE ID (Índice 1)
         if llave_busqueda:
-            reg_date = formatear_fecha(fila[13]) if len(fila) > 13 else ""  # Columna N (Índice 13)
-            status = fila[16] if len(fila) > 16 else ""      # Columna Q (Índice 16)
-            type_inc = fila[17] if len(fila) > 17 else ""    # Columna R (Índice 17)
-            site = fila[4] if len(fila) > 4 else ""        # Columna E (Índice 4)
-            envio = fila[15] if len(fila) > 15 else ""     # Columna P (Índice 15)
-            folio = fila[14] if len(fila) > 14 else ""     # Columna O (Índice 14)
+            reg_date = formatear_fecha(fila[6]) if len(fila) > 6 else ""  # Columna G (Índice 6)
+            status = fila[7] if len(fila) > 7 else ""      # Columna H (Índice 7) Ahora TS
+            type_inc = fila[1] if len(fila) > 1 else ""    # Columna B (Índice 1)
+            site = fila[2] if len(fila) > 2 else ""        # Columna C (Índice 2)
+            envio = fila[5] if len(fila) > 5 else ""     # Columna F (Índice 5) Fecha de envio
+            folio = fila[4] if len(fila) > 4 else ""     # Columna E (Índice 4)
 
             try:
-                fdqty = float(fila[5]) if len(fila) > 5 else 0.0  # Columna F (Índice 5)
+                fdqty = float(fila[3]) if len(fila) > 3 else 0.0  # Columna D (Índice 3)
             except ValueError:
                 fdqty = 0.0
 
@@ -163,7 +163,7 @@ def buscar_pe_lost():
 
     # 4. Buscar columna de destino por su encabezado en Fila 1
     encabezado_buscado = (
-        "Fecha entrega / Site / Piezas / Estado / Tipo inconsistencia / Fecha envio / Folio"
+        "Fecha entrega / Site / Piezas / TS / Tipo inconsistencia / Fecha envio / Folio"
     )
     encabezados = hoja_origen.row_values(1)
 
