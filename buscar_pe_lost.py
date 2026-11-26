@@ -95,7 +95,7 @@ def buscar_pe_lost():
         if len(fila) <= 1:
             continue
 
-        llave_busqueda = str(fila[1]).strip()  # Columna B: ISSUE ID (Índice 1)
+        llave_busqueda = str(fila[0]).strip()  # Columna A: SKU (Índice 0)
         if llave_busqueda:
             reg_date = formatear_fecha(fila[6]) if len(fila) > 6 else ""  # Columna G (Índice 6)
             status = fila[7] if len(fila) > 7 else ""      # Columna H (Índice 7) Ahora TS
