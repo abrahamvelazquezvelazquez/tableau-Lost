@@ -13,7 +13,7 @@ client = gspread.authorize(creds)
 ID_HOJA_PRINCIPAL = "1tLAyayZkAWJ0XtyQWWILutdQ_8sr7rjf1VsXxcAuL4M"
 NOMBRE_PESTAÑA_PRINCIPAL = "Seguimiento"
 
-# Nueva Hoja 1: SEGUIMIENTOS TMWH
+# Hoja 1: SEGUIMIENTOS TMWH
 ID1 = "10OuyIzexaTIW-QnZ6Bo-Vkgh6qexjiTySmHDdijA_m8"
 HOJA1_NOMBRE = "CG.2"
 
@@ -34,7 +34,7 @@ def abrir_hoja_segura(id_or_url):
 
 
 def obtener_mapa_valor_directo(id_sheet, nombre_hoja, col_criterio, col_valor):
-    """Abre la hoja especificada y mapea la clave con el valor directo en texto (sin sumar)."""
+    """Mapea la clave con el primer valor encontrado en texto."""
     ext_ss = abrir_hoja_segura(id_sheet)
     ext_sheet = ext_ss.worksheet(nombre_hoja)
     datos = ext_sheet.get_all_values()
@@ -48,6 +48,41 @@ def obtener_mapa_valor_directo(id_sheet, nombre_hoja, col_criterio, col_valor):
             llave = str(fila[col_criterio]).strip()
             if llave and llave not in mapa:
                 mapa[llave] = str(fila[col_valor]).strip()
+
+    return mapa
+
+
+def obtener_mapa_con_reglas(id_sheet, nombre_hoja, col_criterio, col_valor):
+    """
+    Mapea aplicando reglas de coincidencia:
+    - 1 coincidencia con valor -> valor
+    - 1 coincidencia sin valor -> "null"
+    - >1 coincidencia -> "+1 Registro"
+    """
+    ext_ss = abrir_hoja_segura(id_sheet)
+    ext_sheet = ext_ss.worksheet(nombre_hoja)
+    datos = ext_sheet.get_all_values()
+
+    mapa = {}
+    if not datos:
+        return mapa
+
+    for fila in datos:
+        if len(fila) > col_criterio:
+            llave = str(fila[col_criterio]).strip()
+            if not llave:
+                continue
+
+            valor = (
+                str(fila[col_valor]).strip()
+                if len(fila) > col_valor
+                else ""
+            )
+
+            if llave in mapa:
+                mapa[llave] = "+1 Registro"
+            else:
+                mapa[llave] = valor if valor else "null"
 
     return mapa
 
@@ -71,7 +106,7 @@ def tickets_generados_lost():
         clean_header = " ".join(str(header).split()).lower()
         if clean_header == "piezas con ticket cg":
             col_cg = idx + 1
-        elif clean_header == "piezas con ticket indebidas":  # <-- Corregido a minúsculas
+        elif clean_header == "piezas con ticket indebidas":
             col_indebidas = idx + 1
 
     if col_cg == 0 or col_indebidas == 0:
@@ -86,7 +121,7 @@ def tickets_generados_lost():
     mapa1 = obtener_mapa_valor_directo(ID1, HOJA1_NOMBRE, 2, 3)
 
     # Mapa 2 (Tickets ICQA - indebidas): Criterio Col A (Índice 0), Valor Col J (Índice 9)
-    mapa2 = obtener_mapa_valor_directo(ID2, HOJA2_NOMBRE, 0, 9)
+    mapa2 = obtener_mapa_con_reglas(ID2, HOJA2_NOMBRE, 0, 9)
 
     # 4. Mapear resultados
     resultados_cg = []
@@ -99,7 +134,7 @@ def tickets_generados_lost():
             resultados_indebidas.append([""])
         else:
             val1 = mapa1.get(criterio, "")
-            val2 = mapa2.get(criterio, "")
+            val2 = mapa2.get(criterio, "S/R")
 
             resultados_cg.append([val1])
             resultados_indebidas.append([val2])
@@ -119,12 +154,12 @@ def tickets_generados_lost():
     sheet_destino.update(
         values=resultados_cg,
         range_name=range_cg,
-        value_input_option="USER_ENTERED",
+        value_input_option="RAW",
     )
     sheet_destino.update(
         values=resultados_indebidas,
         range_name=range_indebidas,
-        value_input_option="USER_ENTERED",
+        value_input_option="RAW",
     )
 
     print(
