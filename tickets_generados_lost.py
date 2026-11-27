@@ -71,7 +71,7 @@ def tickets_generados_lost():
         clean_header = " ".join(str(header).split()).lower()
         if clean_header == "piezas con ticket cg":
             col_cg = idx + 1
-        elif clean_header == "piezas con ticket indebidas":
+        elif clean_header == "Piezas con ticket indebidas":
             col_indebidas = idx + 1
 
     if col_cg == 0 or col_indebidas == 0:
