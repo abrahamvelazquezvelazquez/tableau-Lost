@@ -17,7 +17,7 @@ NOMBRE_PESTAÑA_PRINCIPAL = "Seguimiento"
 ID1 = "10OuyIzexaTIW-QnZ6Bo-Vkgh6qexjiTySmHDdijA_m8"
 HOJA1_NOMBRE = "CG.2"
 
-# Hoja 2: Tickets ICQA (ID corregido con 'l' minúsculas)
+# Hoja 2: Tickets ICQA
 ID2 = "1acrZzYBuvEjCQoMqIklzsvIZBfKHSfCo5zMPiNR-h0w"
 HOJA2_NOMBRE = "indebidas"
 
@@ -71,20 +71,21 @@ def tickets_generados_lost():
         clean_header = " ".join(str(header).split()).lower()
         if clean_header == "piezas con ticket cg":
             col_cg = idx + 1
-        elif clean_header == "Piezas con ticket indebidas":
+        elif clean_header == "piezas con ticket indebidas":  # <-- Corregido a minúsculas
             col_indebidas = idx + 1
 
     if col_cg == 0 or col_indebidas == 0:
         print(
-            "Error: No se encontró la columna 'Piezas con ticket CG' o 'Piezas con ticket indebidas'."
+            f"Error: No se encontraron los encabezados. "
+            f"col_cg={col_cg}, col_indebidas={col_indebidas}"
         )
         return
 
-    # 3. Construir mapas (ambos extraen el valor directo como texto)
+    # 3. Construir mapas
     # Mapa 1 (SEGUIMIENTOS TMWH - CG.2): Criterio Col C (Índice 2), Valor Col D (Índice 3)
     mapa1 = obtener_mapa_valor_directo(ID1, HOJA1_NOMBRE, 2, 3)
 
-    # Mapa 2 (Tickets ICQA - indebidas): Criterio Col A (Índice 0), Valor Col A (Índice 0)
+    # Mapa 2 (Tickets ICQA - indebidas): Criterio Col A (Índice 0), Valor Col J (Índice 9)
     mapa2 = obtener_mapa_valor_directo(ID2, HOJA2_NOMBRE, 0, 9)
 
     # 4. Mapear resultados
@@ -115,11 +116,20 @@ def tickets_generados_lost():
         f"{col_indebidas_letter}{fila_inicio}:{col_indebidas_letter}{fila_fin}"
     )
 
-    sheet_destino.update(values=resultados_cg, range_name=range_cg)
-    sheet_destino.update(values=resultados_indebidas, range_name=range_indebidas)
+    sheet_destino.update(
+        values=resultados_cg,
+        range_name=range_cg,
+        value_input_option="USER_ENTERED",
+    )
+    sheet_destino.update(
+        values=resultados_indebidas,
+        range_name=range_indebidas,
+        value_input_option="USER_ENTERED",
+    )
 
     print(
-        f"Se actualizaron {len(valores_e)} filas en ambas columnas de tickets exitosamente."
+        f"Se actualizaron {len(valores_e)} filas en las columnas "
+        f"{col_cg_letter} y {col_indebidas_letter} exitosamente."
     )
 
 
