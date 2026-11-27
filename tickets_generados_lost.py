@@ -85,7 +85,7 @@ def tickets_generados_lost():
     mapa1 = obtener_mapa_valor_directo(ID1, HOJA1_NOMBRE, 2, 3)
 
     # Mapa 2 (Tickets ICQA - indebidas): Criterio Col A (Índice 0), Valor Col A (Índice 0)
-    mapa2 = obtener_mapa_valor_directo(ID2, HOJA2_NOMBRE, 1, 0)
+    mapa2 = obtener_mapa_valor_directo(ID2, HOJA2_NOMBRE, 0, 9)
 
     # 4. Mapear resultados
     resultados_cg = []
