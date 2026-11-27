@@ -34,7 +34,7 @@ def abrir_hoja_segura(id_or_url):
 
 
 def obtener_mapa_valor_directo(id_sheet, nombre_hoja, col_criterio, col_valor):
-    """Abre la hoja especificada y mapea la clave con el valor directo (sin sumar)."""
+    """Abre la hoja especificada y mapea la clave con el valor directo en texto (sin sumar)."""
     ext_ss = abrir_hoja_segura(id_sheet)
     ext_sheet = ext_ss.worksheet(nombre_hoja)
     datos = ext_sheet.get_all_values()
@@ -48,30 +48,6 @@ def obtener_mapa_valor_directo(id_sheet, nombre_hoja, col_criterio, col_valor):
             llave = str(fila[col_criterio]).strip()
             if llave and llave not in mapa:
                 mapa[llave] = str(fila[col_valor]).strip()
-
-    return mapa
-
-
-def obtener_mapa_suma_num(id_sheet, nombre_hoja, col_criterio, col_suma):
-    """Mantiene la suma numérica para la hoja 2 (indebidas)."""
-    ext_ss = abrir_hoja_segura(id_sheet)
-    ext_sheet = ext_ss.worksheet(nombre_hoja)
-    datos = ext_sheet.get_all_values()
-
-    mapa = {}
-    if not datos:
-        return mapa
-
-    for fila in datos:
-        if len(fila) > max(col_criterio, col_suma):
-            llave = str(fila[col_criterio]).strip()
-            if llave:
-                try:
-                    valor = float(fila[col_suma])
-                except ValueError:
-                    valor = 0.0
-
-                mapa[llave] = mapa.get(llave, 0.0) + valor
 
     return mapa
 
@@ -104,12 +80,12 @@ def tickets_generados_lost():
         )
         return
 
-    # 3. Construir mapas
-    # Mapa 1 (SEGUIMIENTOS TMWH - CG.2): Criterio Col C (Índice 2), Obtiene Valor Directo de Col E (Índice 4)
+    # 3. Construir mapas (ambos extraen el valor directo como texto)
+    # Mapa 1 (SEGUIMIENTOS TMWH - CG.2): Criterio Col C (Índice 2), Valor Col D (Índice 3)
     mapa1 = obtener_mapa_valor_directo(ID1, HOJA1_NOMBRE, 2, 3)
 
-    # Mapa 2 (Tickets ICQA - indebidas): Criterio Col A (Índice 0), Suma Numérica Col B (Índice 1)
-    mapa2 = obtener_mapa_suma_num(ID2, HOJA2_NOMBRE, 0, 11)
+    # Mapa 2 (Tickets ICQA - indebidas): Criterio Col A (Índice 0), Valor Col L (Índice 11)
+    mapa2 = obtener_mapa_valor_directo(ID2, HOJA2_NOMBRE, 0, 11)
 
     # 4. Mapear resultados
     resultados_cg = []
@@ -119,17 +95,13 @@ def tickets_generados_lost():
         criterio = str(item).strip()
         if not criterio:
             resultados_cg.append([""])
-            resultados_indebidas.append([0])
+            resultados_indebidas.append([""])
         else:
             val1 = mapa1.get(criterio, "")
-            val2 = mapa2.get(criterio, 0.0)
-
-            val2_formatted = (
-                int(val2) if isinstance(val2, float) and val2.is_integer() else val2
-            )
+            val2 = mapa2.get(criterio, "")
 
             resultados_cg.append([val1])
-            resultados_indebidas.append([val2_formatted])
+            resultados_indebidas.append([val2])
 
     # 5. Escritura masiva
     fila_inicio = 2
